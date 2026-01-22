@@ -5,3 +5,4 @@
 *.sh
 objfiles
 compile_commands.json
+/.cache

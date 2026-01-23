@@ -31,7 +31,9 @@ int main(int argc, char* argv[]) {
   } else if (is_mode("destroy")) {
     if (!directory_exists("__bervenv__"))
       beryl::throw_arg_read_error("Bervenv does not exist to remove");
-    fs::remove_all("__bervenv__");
+    std::error_code ec;
+    if (!fs::remove_all("__bervenv__", ec))
+      beryl::throw_arg_read_error("Failed to destroy venv: " + ec.message());
   } else if (is_mode("build")) {
     if (!directory_exists("__bervenv__")) beryl::throw_arg_read_error("No bervenv to compile in");
     std::vector<fs::path> paths_to_by_file;
@@ -40,15 +42,18 @@ int main(int argc, char* argv[]) {
     int ver = 1;
     bool link = true;
     bool force_module_recompile = false;
+    int opt_level = 1;
 
     for (size_t i = 2; i < argc; ++i) {
       std::string arg = argv[i];
       if (fs::path(arg).extension() == ".by") paths_to_by_file.emplace_back(arg);
       else if (arg == "--no-link") link = false;
       else if (arg == "--force-module-recompile") force_module_recompile = true;
+      else if (arg == "-O1") opt_level = 1;
+      else if (arg == "-O2") opt_level = 2;
+      else if (arg == "-O3") opt_level = 3;
       else if (arg.rfind("-includes=", 0) == 0) includes = beryl::get_includes(arg.substr(10));
-      else if (arg.rfind("-out=", 0) == 0)
-        exec = arg.substr(6);
+      else if (arg.rfind("-out=", 0) == 0) exec = arg.substr(6);
       else if (arg.rfind("-std=", 0) == 0) {
         std::string verstr = arg.substr(5);
         if (verstr == "be1") ver = 1;

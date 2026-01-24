@@ -18,8 +18,8 @@ LDFLAGS   := $(LIB_DIRS) -Wl,-rpath,$(LLVM_PATH)/lib -lLLVM
 # Automatically find all .cpp files in utils/
 UTILS_SRCS := $(wildcard utils/*.cpp)
 UTILS_OBJS := $(UTILS_SRCS:.cpp=.o)
-MAIN_SRC   := main.cpp
-MAIN_OBJ   := main.o
+BERYL_SRC   := beryl.cpp
+BERYL_OBJ   := beryl.o
 
 LIB_BERYL  := libberylutils.a
 TARGET     := beryl
@@ -29,8 +29,8 @@ TARGET     := beryl
 all: $(TARGET)
 
 # Link the final executable
-$(TARGET): $(MAIN_OBJ) $(LIB_BERYL)
-	$(CXX) $(CXXFLAGS) $(MAIN_OBJ) -L. -lberylutils $(LDFLAGS) -o $(TARGET)
+$(TARGET): $(BERYL_OBJ) $(LIB_BERYL)
+	$(CXX) $(CXXFLAGS) $(BERYL_OBJ) -L. -lberylutils $(LDFLAGS) -o $(TARGET)
 
 # Build the static library from utils
 $(LIB_BERYL): $(UTILS_OBJS)
@@ -46,4 +46,4 @@ compiledb:
 	compiledb make
 
 clean:
-	rm -f $(TARGET) $(MAIN_OBJ) $(UTILS_OBJS) $(LIB_BERYL) compile_commands.json
+	rm -f $(TARGET) $(BERYL_OBJ) $(UTILS_OBJS) $(LIB_BERYL) compile_commands.json

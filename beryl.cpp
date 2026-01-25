@@ -108,10 +108,14 @@ struct Token {
     HEXC,
     UNIC,
     TYPEOF,
-
+    VALAT,
+    PTRTO,
+    SIZEOF
   } type;
 
   std::string metadata;
+  int line;
+  int col;
 };
 
 namespace fs = std::filesystem;
@@ -146,8 +150,11 @@ int main(int argc, char* argv[]) {
     if (argc > 2) {
       if (std::string(argv[2]) == "--force") do_rem = true;
     } else do_rem = ask();
-    if (do_rem && !fs::remove_all("__bervenv__", ec))
-      beryl::throw_arg_read_error("Failed to destroy venv: " + ec.message());
+    if (do_rem) {
+      std::uintmax_t count = fs::remove_all("__bervenv__", ec);
+      if (count == static_cast<std::uintmax_t>(-1) || ec.value() != 0)
+        beryl::throw_arg_read_error("Failed to destroy venv: " + ec.message());
+    }
   } else if (is_mode("build")) {
     if (!directory_exists("__bervenv__")) beryl::throw_arg_read_error("No bervenv to compile in");
     std::vector<fs::path> paths_to_by_file;
@@ -184,8 +191,8 @@ int main(int argc, char* argv[]) {
 
     if (ver.major == 1) {
       for (const std::filesystem::path& path : paths_to_by_file) {
-        llvm::Module mod("BerylliumModule", context);
-        llvm::IRBuilder<> builder(context);
+        [[maybe_unused]] llvm::Module mod("BerylliumModule", context);
+        [[maybe_unused]] llvm::IRBuilder<> builder(context);
 
         std::string buf;
         if (!fs::exists(path)) {
@@ -193,19 +200,25 @@ int main(int argc, char* argv[]) {
           for (const auto& prefix : includes) {
             if (auto appended_path = prefix / path; fs::exists(appended_path)) {
               std::ifstream file(appended_path);
-              std::ostringstream tmp;
-              tmp << file.rdbuf();
-              buf = tmp.str();
-              found = true;
-              break;
+              if (file.is_open() && file.good()) {
+                std::ostringstream tmp;
+                tmp << file.rdbuf();
+                buf = tmp.str();
+                found = true;
+                break;
+              }
             }
           }
           if (!found) beryl::throw_arg_read_error("Could not find file: " + path.string());
         } else {
           std::ifstream file(path);
-          std::ostringstream tmp;
-          tmp << file.rdbuf();
-          buf = tmp.str();
+          if (file.is_open() && file.good()) {
+            std::ostringstream tmp;
+            tmp << file.rdbuf();
+            buf = tmp.str();
+          } else {
+            beryl::throw_arg_read_error("Failed to open file: " + path.string());
+          }
         }
 
         std::vector<Token> tokens = [&buf, &path]() {
@@ -220,12 +233,19 @@ int main(int argc, char* argv[]) {
           };
 
           while (cursor < buf.length()) {
-            //
+            // TODO: implement tokenizer
+            (void)line;
+            (void)col;
+            (void)peek;
+            (void)path;
+            break;
           }
           return tokens;
         }();
       }
     }
-  } else beryl::throw_arg_read_error("Invalid option");
+  } else if (is_mode("--version")) {
+    std::cout << "Beryl 1.0\n";
+  }
   return 0;
 }

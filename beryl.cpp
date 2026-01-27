@@ -40,6 +40,8 @@ struct Token {
     SEMI,
     INT_LIT,
     FLOAT_LIT,
+    STR_LIT,
+    CHAR_LIT,
     VAR,
     IDENT,
     IF,
@@ -47,8 +49,6 @@ struct Token {
     DO,
     COLON,
     COMMA,
-    OPEN_ANGLE,
-    CLOSE_ANGLE,
     FUNC,
     OPEN_PAREN,
     CLOSE_PAREN,
@@ -79,7 +79,8 @@ struct Token {
     OR,
     NOT,
     EQ,
-    IMPORT,
+    ASSIGN,
+    NOT_EQ,
     BOOL,
     CHAR,
     BYTE,
@@ -116,6 +117,79 @@ struct Token {
   std::string metadata;
   int line;
   int col;
+};
+
+const std::unordered_map<std::string_view, decltype(Token::VAR)> keywords = {
+    {";", Token::SEMI},
+    {"var", Token::VAR},
+    {"if", Token::IF},
+    {"while", Token::WHILE},
+    {"do", Token::DO},
+    {":", Token::COLON},
+    {",", Token::COMMA},
+    {"func", Token::FUNC},
+    {"(", Token::OPEN_PAREN},
+    {")", Token::CLOSE_PAREN},
+    {"exit", Token::EXIT},
+    {"return", Token::RETURN},
+    {"+", Token::PLUS},
+    {"-", Token::MINUS},
+    {"*", Token::ASTER},
+    {"/", Token::FORW_SLASH},
+    {"\\", Token::BACK_SLASH},
+    {"%", Token::MOD},
+    {"mut", Token::MUT},
+    {"<<", Token::LEFT_SHIFT},
+    {">>", Token::RIGHT_SHIFT},
+    {"<", Token::LESS},
+    {">", Token::GREATER},
+    {"{", Token::OPEN_CURLY},
+    {"}", Token::CLOSE_CURLY},
+    {"for", Token::FOR},
+    {"repeat", Token::REPEAT},
+    {"band", Token::BAND},
+    {"bor", Token::BOR},
+    {"bxor", Token::BXOR},
+    {"bxnot", Token::BXNOT},
+    {"as", Token::AS},
+    {"unsafe", Token::UNSAFE},
+    {"&&", Token::AND},
+    {"||", Token::OR},
+    {"!", Token::NOT},
+    {"=", Token::ASSIGN},
+    { "==", Token::EQ },
+    {"!=", Token::NOT_EQ},
+    {"bool", Token::BOOL},
+    {"char", Token::CHAR},
+    {"byte", Token::BYTE},
+    {"int", Token::INT},
+    {"long", Token::LONG},
+    {"qint", Token::QINT},
+    {"ubyte", Token::UBYTE},
+    {"uint", Token::UINT},
+    {"ulong", Token::ULONG},
+    {"uqint", Token::UQINT},
+    {"float", Token::FLOAT},
+    {"double", Token::DOUBLE},
+    {"namespace", Token::NMSP},
+    {"string", Token::STRING},
+    {"bytestream", Token::BYTESTREAM},
+    {"arr", Token::ARR},
+    {"dynarr", Token::DYNARR},
+    {"adr", Token::ADR},
+    {"ptr", Token::PTR},
+    {"rcptr", Token::RCPTR},
+    {"weakptr", Token::WEAKPTR},
+    {"unsafeptr", Token::UNSAFEPTR},
+    {"ref", Token::REF},
+    {"result", Token::RESULT},
+    {"tup", Token::TUP},
+    {"hexc", Token::HEXC},
+    {"unic", Token::UNIC},
+    {"typeof", Token::TYPEOF},
+    {"valat", Token::VALAT},
+    {"ptrto", Token::PTRTO},
+    {"sizeof", Token::SIZEOF}
 };
 
 namespace fs = std::filesystem;
@@ -189,10 +263,10 @@ int main(int argc, char* argv[]) {
 
     llvm::LLVMContext context;
 
-    if (ver.major == 1) {
+    if (ver == Version{ .major = 1, .minor = 0 }) {
       for (const std::filesystem::path& path : paths_to_by_file) {
-        [[maybe_unused]] llvm::Module mod("BerylliumModule", context);
-        [[maybe_unused]] llvm::IRBuilder<> builder(context);
+        llvm::Module mod("BerylliumModule", context);
+        llvm::IRBuilder<> builder(context);
 
         std::string buf;
         if (!fs::exists(path)) {
@@ -226,26 +300,143 @@ int main(int argc, char* argv[]) {
           size_t cursor = 0;
           int line = 1;
           int col = 1;
+          bool in_type_dec = false;
 
           auto peek = [&](size_t offset = 0) {
-            if (cursor + offset >= buf.length()) return '\0';
+            if (cursor + offset >= buf.length())
+              return '\0';
             return buf[cursor + offset];
           };
 
-          while (cursor < buf.length()) {
-            // TODO: implement tokenizer
-            (void)line;
-            (void)col;
-            (void)peek;
-            (void)path;
-            break;
+          constexpr int MAX_ITER = 10000;
+          int iter_num = 0;
+          while (cursor < buf.length() && iter_num < MAX_ITER) {
+            // skips whitespace
+            while (std::isspace(peek())) {
+              std::cerr << "Skipping whitespace\n";
+              if (peek() == '\n') ++line;
+              ++col;
+              ++cursor;
+            }
+            // checks single-line comments
+            if (peek() == '/' && peek(1) == '/') {
+              std::cerr << "Saw single-line comment\n";
+              cursor += 2;
+              col += 2;
+              while (peek() != '\n') {
+                std::cerr << "Continuing comment\n";
+                ++cursor;
+                ++col;
+              }
+              ++cursor;
+              ++line;
+            }
+
+            // checks multi-line comments
+            if (peek() == '/' && peek(1) == '*') {
+              std::cerr << "Saw multi-line comment\n";
+              cursor += 2;
+              col += 2;
+              while (!(peek() == '*' && peek(1) == '/') && cursor < buf.length()) {
+                std::cerr << "Continued multi-line comment\n";
+                if (peek() == '\n') ++line;
+                ++cursor;
+                ++col;
+              }
+            }
+
+            // checks string literals (sorry no f strings yet)
+            if (peek() == '"') {
+              std::cerr << "Saw string literal\n";
+              Token tok;
+              tok.type = Token::STR_LIT;
+              tok.line = line;
+              tok.col = col;
+              ++cursor;
+              ++col;
+              while (peek() != '"' && cursor < buf.length()) {
+                std::cerr << "Continued string literal\n";
+                if (peek() == '\\' && peek(1) == 'n') {
+                  cursor += 2;
+                  col += 2;
+                  tok.metadata += '\n';
+                } else if (peek() == '\\' && peek(1) == '\n') {
+                  cursor += 2;
+                  col += 2;
+                  ++line;
+                } else if (peek() == '\\' && peek(1) == '\0') {
+                  cursor += 2;
+                  col += 2;
+                  tok.metadata += '\0';
+                } else if (peek() == '\\' && peek(1) == '"') {
+                  cursor += 2;
+                  col += 2;
+                  tok.metadata += '"';
+                } else {
+                  tok.metadata += peek();
+                  ++cursor;
+                  ++col;
+                }
+              }
+              ++cursor;
+              ++col;
+              tokens.push_back(tok);
+            }
+
+            // checks character
+            if (peek() == '\'') {
+              // atriv you do this
+            }
+
+            // Keywords/Identifiers
+            if (std::isalpha(peek()) || peek() == '_') {
+              std::string s;
+              int start_col = col;
+              while (std::isalnum(peek()) || peek() == '_') {
+                s += peek();
+                ++cursor; ++col;
+              }
+
+              Token tok;
+              tok.line = line;
+              tok.col = start_col;
+              tok.metadata = s;
+
+              if (auto it = keywords.find(s); it != keywords.cend()) tok.type = it->second;
+              else tok.type = Token::IDENT;
+
+              tokens.push_back(tok);
+              continue;
+            }
+
+            // Number literals
+            if (peek() == '-' || std::isdigit(peek())) {
+              // Atriv does this
+            }
+            ++iter_num;
           }
           return tokens;
         }();
       }
     }
-  } else if (is_mode("--version")) {
+  } else if (is_mode("help") || is_mode("--help")) {
+    std::cout << "Beryl help page\n"
+      "beryl create: creates a virtual environment\n"
+      "    --no-stdlib: does not install the standard library\n"
+      "beryl destroy: removes the virtual environment\n"
+      "    --force: removes the prompt\n"
+      "beryl build: builds a file\n"
+      "    --no-link: does not link the object file\n"
+      "    --force-module-recompile: recompiles all modules\n"
+      "    -O0: no optimization\n"
+      "    -O1: one level optimization\n"
+      "    -O2: two levels of optimization\n"
+      "    -O3: three levels of optimization\n"
+      "    -includes= : include paths provided in a JSON file\n"
+      "    -out= : output file, with no linking, object file, with linking, executable\n"
+      "    -std= : Beryllium standard to use. Valid values are be1. Defaults to latest version, currently be1\n";
+  } else if (is_mode("--version") || is_mode("version") || is_mode("-v")) {
     std::cout << "Beryl 1.0\n";
-  }
+  } else beryl::throw_arg_read_error("Unknown mode");
   return 0;
 }

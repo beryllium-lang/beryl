@@ -1,5 +1,12 @@
 import std.io;
 
 func start(args: dynarr<string>) {
-  std.out.print("Hello, World!"); // single line
+  std.io.println("Hello world!");
+
+  var ptr: unsafeptr<int> = nullptr;
+  var b = true;
+  var b_exp_type: bool = false;
+
+  var nest_gen_check: dynarr<unsafeptr<int>>;
+  exit 0;
 }

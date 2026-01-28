@@ -1,8 +1,5 @@
 import std.io;
 
 func start(args: dynarr<string>) {
-  var x: int = 0; // commment example
-  var y: uqint = 9;
-  std.out.print("Hello, World!");
-  exit 0;
+  std.out.print("Hello, World!"); // single line
 }

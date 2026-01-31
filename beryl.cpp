@@ -342,7 +342,12 @@ void create_venv(CompileArgs args) {
     beryl::throw_arg_read_error("Failed to create venv: " + std::string(e.what()));
   }
   if (install_stdlib) {
-    // MineralOil needs to be implemented first
+    std::cout << "Installing standard library...\n";
+    try {
+      std::system("python3 -m mineraloil/minoil.py install stdlib");
+    } catch (const std::exception& e) {
+      beryl::throw_arg_read_error("Failed to install standard library: " + std::string(e.what()));
+    }
   }
 }
 

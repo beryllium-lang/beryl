@@ -3,6 +3,7 @@
 #include <cstdlib>
 #include <utility>
 #include <cassert>
+#include <limits>
 
 namespace beryl {
   class Arena {

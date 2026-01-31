@@ -27,6 +27,8 @@ PACKAGES_TXT = os.path.join(BERVENV_DIR, "syspacks/packages.txt")
 PACKAGES_JSON = os.path.join(BERVENV_DIR, "syspacks/packages.json")
 
 # utility to read installed packages
+
+
 def read_installed_packages():
     if not os.path.isdir(BERVENV_DIR):
         return None  # venv not created
@@ -41,6 +43,8 @@ def read_installed_packages():
     return installed
 
 # utility to write installed packages
+
+
 def write_installed_packages(installed):
     if not os.path.isdir(BERVENV_DIR):
         print("Bervenv not created.")
@@ -59,12 +63,15 @@ def write_installed_packages(installed):
         json.dump({"packages": installed}, f, indent=4)
 
 # parse package@version
+
+
 def parse_package_arg(arg):
     if "@" in arg:
         name, version = arg.split("@", 1)
     else:
         name, version = arg, None
     return name, version
+
 
 def main():
     argc = len(sys.argv)
@@ -97,7 +104,7 @@ def main():
 
         # default to latest version if not specified
         if not version:
-            version = package_versions.get(name, [])[ -1 ]
+            version = package_versions.get(name, [])[-1]
 
         full_package = f"{name}@{version}"
 
@@ -105,18 +112,21 @@ def main():
         installed_names = [p.split("@")[0] for p in installed]
         if name in installed_names:
             idx = installed_names.index(name)
-            old_version = installed[idx].split("@")[1] if "@" in installed[idx] else None
+            old_version = installed[idx].split(
+                "@")[1] if "@" in installed[idx] else None
             if old_version == version:
                 print(f"Package '{full_package}' is already installed.")
             else:
                 action = "upgraded" if version > old_version else "downgraded"
                 if force:
-                    print(f"Force {action} '{name}' from {old_version} to {version}...")
+                    print(
+                        f"Force {action} '{name}' from {old_version} to {version}...")
                     installed[idx] = full_package
                     write_installed_packages(installed)
                     print(f"Package '{full_package}' {action} successfully!")
                 else:
-                    print(f"Package '{name}' already installed with version {old_version}.")
+                    print(
+                        f"Package '{name}' already installed with version {old_version}.")
                     print(f"Use --force to {action} to {version}.")
         else:
             print(f"Installing package: {full_package}...")
@@ -161,6 +171,7 @@ def main():
 
     else:
         print(f"Error: Command '{command}' not found or missing arguments.")
+
 
 if __name__ == "__main__":
     main()

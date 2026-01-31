@@ -169,6 +169,19 @@ def main():
             for pkg in installed:
                 print(f"- {pkg}")
 
+    elif command == "help":
+        print("""
+-------- Mineral Oil --------
+- Beryllium Package Manager -
+-----------------------------
+Usage: minoil [command] [options]
+Usage: mineraloil [command] [options]
+Commands:
+    install [package[@version]]   Install a package (latest version if not specified)
+    uninstall [package[@version]] Uninstall a package (all versions if not specified)
+    list                          List installed packages
+    help                          Show this help message
+""")
     else:
         print(f"Error: Command '{command}' not found or missing arguments.")
 

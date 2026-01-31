@@ -1,4 +1,5 @@
 # --- Compiler Selection ---
+# MAC OS X specific LLVM path
 LLVM_PATH := /opt/homebrew/opt/llvm
 CXX       := $(LLVM_PATH)/bin/clang++
 SDK_PATH  := $(shell xcrun --show-sdk-path)

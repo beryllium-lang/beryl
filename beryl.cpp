@@ -391,10 +391,12 @@ void build(CompileArgs args) {
           if (std::isspace(peek())) {
             if (peek() == '\n') {
               ++line;
+              ++cursor;
               col = 1;
+            } else {
+              ++cursor;
+              ++col;
             }
-            ++cursor;
-            ++col;
             continue;
           }
           // checks single-line comments

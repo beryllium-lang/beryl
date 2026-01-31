@@ -5,6 +5,7 @@
 *.sh
 objfiles
 compile_commands.json
+*.pyc
 /.cache
 /.venv
 

@@ -3,7 +3,7 @@ import std.io;
 func start(args: dynarr<string>) {
   std.io.println("Hello world!");
 
-  var ptr: unsafeptr<int> = nullptr;
+  var pointer: unsafeptr<int> = nullptr;
   var b = true;
   var b_exp_type: bool = false;
 

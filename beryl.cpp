@@ -377,7 +377,6 @@ void build(CompileArgs args) {
         size_t cursor = 0;
         int line = 1;
         int col = 1;
-        bool in_type_dec = false;
 
         auto peek = [&](size_t offset = 0) {
           if (cursor + offset >= buf.length())
@@ -419,10 +418,14 @@ void build(CompileArgs args) {
             cursor += 2;
             col += 2;
             while (!(peek() == '*' && peek(1) == '/') && cursor < buf.length()) {
-              if (peek() == '\n')
+              if (peek() == '\n') {
                 ++line;
-              ++cursor;
-              ++col;
+                ++cursor;
+                col = 1;
+              } else {
+                ++cursor;
+                ++col;
+              }
             }
             if (peek() == '*' && peek(1) == '/') {
               cursor += 2;
@@ -475,7 +478,40 @@ void build(CompileArgs args) {
 
           // checks character
           if (peek() == '\'') {
-            // atriv you do this
+            Token tok;
+            tok.type = Token::CHAR_LIT;
+            tok.line = line;
+            tok.col = col;
+            ++cursor;
+            ++col;
+            if (peek() == '\\') {
+              if (peek(1) == 'n') {
+                tok.metadata = '\n';
+                cursor += 2;
+                col += 2;
+              } else if (peek(1) == '0') {
+                tok.metadata = '\0';
+                cursor += 2;
+                col += 2;
+              } else if (peek(1) == '\'') {
+                tok.metadata = '\'';
+                cursor += 2;
+                col += 2;
+              } else {
+                beryl::throw_lex_error("Unknown escape sequence in character literal", line, col);
+              }
+            } else {
+              tok.metadata = peek();
+              ++cursor;
+              ++col;
+            }
+            if (peek() != '\'') {
+              beryl::throw_lex_error("Unterminated character literal", tok.line, tok.col);
+            }
+            ++cursor;
+            ++col;
+            tokens.push_back(tok);
+            continue;
           }
 
           // Keywords/Identifiers

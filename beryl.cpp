@@ -468,7 +468,7 @@ void build(CompileArgs args) {
             beryl::throw_arg_read_error("Tokenizer iteration limit exceeded");
           }
           // skips whitespace
-          while (std::isspace(peek())) {
+          if (std::isspace(peek())) {
             if (peek() == '\n') {
               ++line;
               col = 1;

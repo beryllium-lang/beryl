@@ -10,6 +10,7 @@ packages = [
     "foo",
     "bar",
     "baz",
+    "std",
 ]
 
 # simulate available versions for packages
@@ -17,7 +18,8 @@ package_versions = {
     "test": ["1.0.0", "1.1.0"],
     "foo": ["1.0.0", "2.0.0"],
     "bar": ["0.1.0", "0.2.0", "0.3.0"],
-    "baz": ["0.5.0"]
+    "baz": ["0.5.0"],
+    "std": ["0.1.0"],
 }
 
 # bervenv directory

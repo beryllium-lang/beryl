@@ -18,7 +18,7 @@ func start(args: dynarr<string>) {
 
   var char_test = 'd';
 
-  var nest_gen_check: dynarr<unsafeptr<int>>;
+  var nest_gen_check: dynarr<unsafeptr<dynarr<int>>>;
   exit 0;
 }
 /*

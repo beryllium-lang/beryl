@@ -4,10 +4,23 @@ import sys
 import os
 import json
 import requests
+import time
 
 # initial available packages (for testing)
+start_time = time.time()
 
-r = requests.get("https://pentagonx.github.io/beryllium-packages/packages.txt")
+def current_time():
+    return time.time()
+
+timeout = 5
+# fix this with a lambda script to check timeout scripts.
+while (start_time + timeout) > current_time():
+    r = requests.get("https://pentagonx.github.io/beryllium-packages/packages.txt")
+    if (start_time + timeout) < current_time():
+        print("Operation Failed, offline mode detected!")
+        break
+
+print(r)
 response = r.text
 packages_unfiltered = response.splitlines()
 packages = []
@@ -82,7 +95,16 @@ def parse_package_arg(arg):
 def install_package(name, version):
     r = requests.get("https://pentagonx.github.io/beryllium-packages/" + name + "/modules.txt")
     response = r.text
+    
     modules = response.splitlines()
+    for element in modules:
+        if len(element.strip()) > 51:
+            print(f"Warning: Invalid module name found. Can be ignored. [ERR: LONG_MODULE_NAME]")
+            if name == element.strip():
+                print("Failure: Package is invalid due to module name being too long. Aborting installation. Please raise this to the package managers.")
+                return
+            else:
+                pass
     package_dir = os.path.join(SYSPACKS, name)
     os.makedirs(package_dir, exist_ok=True)
     for module in modules:
@@ -96,6 +118,7 @@ def main():
     argv = sys.argv
     if argc <= 1:
         print("Usage: minoil [command] [options]")
+        print("Run 'minoil help' for more information.")
         return
 
     command = argv[1].lower()

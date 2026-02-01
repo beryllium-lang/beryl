@@ -1,44 +1,47 @@
-# This Makefile was written by Gemini but i forgot when i made it
-# It only works on my machine (MacOS with homebrew llvm)
+# --- Project root ---
+ROOT := .
 
-# --- Compiler Selection ---
-# MAC OS X specific LLVM path
-LLVM_PATH := /opt/homebrew/opt/llvm
-CXX       := $(LLVM_PATH)/bin/clang++
-SDK_PATH  := $(shell xcrun --show-sdk-path)
+# --- Compiler ---
+CXX := g++
 
-# --- Paths & Flags ---
-INCLUDES  := -I$(SDK_PATH)/usr/include/c++/v1 \
-             -I$(SDK_PATH)/usr/include \
-             -I$(LLVM_PATH)/include \
-             -I.
+# --- LLVM flags ---
+LLVM_CXXFLAGS := $(shell llvm-config --cxxflags)
+LLVM_LDFLAGS  := $(shell llvm-config --ldflags --libs --system-libs)
 
-CXXFLAGS  := -std=c++20 -O2 -nostdinc++ $(INCLUDES) -isysroot $(SDK_PATH)
-LDFLAGS   := -L$(LLVM_PATH)/lib -Wl,-rpath,$(LLVM_PATH)/lib -lLLVM -lc++
+# --- Base flags ---
+BASE_CXXFLAGS := -std=c++20 -O2 -Wall -Wextra -I$(ROOT) -fexceptions
 
-# --- Files ---
-SRCS      := $(shell find . -name "*.cpp")
-# This transforms the list of .cpp files into .o files
-OBJS      := $(SRCS:.cpp=.o)
-TARGET    := beryl
+CXXFLAGS := $(BASE_CXXFLAGS) $(LLVM_CXXFLAGS)
+
+# --- Sources (auto-discover) ---
+SRCS := $(shell find $(ROOT) -type f -name "*.cpp")
+
+# --- Objects (mirror directory structure locally) ---
+OBJS := $(patsubst $(ROOT)/%.cpp,%.o,$(SRCS))
+
+# --- Target ---
+TARGET := beryl
 
 # --- Rules ---
-
 all: $(TARGET)
 
-# Linking Step
+# Link
 $(TARGET): $(OBJS)
-	$(CXX) $(OBJS) $(LDFLAGS) -o $(TARGET)
+	$(CXX) $(OBJS) $(LLVM_LDFLAGS) -o $@
 
-# Compilation Step (The % is a wildcard for the filename)
-%.o: %.cpp
+# Compile rule
+%.o: $(ROOT)/%.cpp
+	@mkdir -p $(dir $@)
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 clean:
-	rm -f $(TARGET) $(OBJS)
-
-.PHONY: all clean
+	rm -rf $(TARGET) *.o be1 utils
 
 debug:
-	@echo "Source files: $(SRCS)"
-	@echo "Object files: $(OBJS)"
+	@echo "Sources:"
+	@printf "  %s\n" $(SRCS)
+	@echo
+	@echo "Objects:"
+	@printf "  %s\n" $(OBJS)
+
+.PHONY: all clean debug

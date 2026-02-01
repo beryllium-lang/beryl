@@ -1,10 +1,12 @@
+# This Makefile was written by Gemini but i forgot when i made it
+# It only works on my machine (MacOS with homebrew llvm)
+
 # --- Compiler Selection ---
 # MAC OS X specific LLVM path
 LLVM_PATH := /opt/homebrew/opt/llvm
 CXX       := $(LLVM_PATH)/bin/clang++
 SDK_PATH  := $(shell xcrun --show-sdk-path)
 
-# cap all of this is un needed, just delete it trash stuff
 # --- Paths & Flags ---
 INCLUDES  := -I$(SDK_PATH)/usr/include/c++/v1 \
              -I$(SDK_PATH)/usr/include \
@@ -15,7 +17,7 @@ CXXFLAGS  := -std=c++20 -O2 -nostdinc++ $(INCLUDES) -isysroot $(SDK_PATH)
 LDFLAGS   := -L$(LLVM_PATH)/lib -Wl,-rpath,$(LLVM_PATH)/lib -lLLVM -lc++
 
 # --- Files ---
-SRCS      := beryl.cpp $(wildcard utils/*.cpp)
+SRCS      := $(shell find . -name "*.cpp")
 # This transforms the list of .cpp files into .o files
 OBJS      := $(SRCS:.cpp=.o)
 TARGET    := beryl
@@ -36,3 +38,7 @@ clean:
 	rm -f $(TARGET) $(OBJS)
 
 .PHONY: all clean
+
+debug:
+	@echo "Source files: $(SRCS)"
+	@echo "Object files: $(OBJS)"

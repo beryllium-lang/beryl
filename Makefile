@@ -1,5 +1,5 @@
-# This Makefile was written by Gemini but i forgot when i made it
-# It only works on my machine (MacOS with homebrew llvm)
+# This Makefile was initially written by Gemini but I forgot when I made it and I have made modifications since.
+# It only works on my machine (MacOS with homebrew LLVM)
 
 # --- Compiler Selection ---
 # MAC OS X specific LLVM path
@@ -17,7 +17,11 @@ CXXFLAGS  := -std=c++20 -O2 -nostdinc++ $(INCLUDES) -isysroot $(SDK_PATH)
 LDFLAGS   := -L$(LLVM_PATH)/lib -Wl,-rpath,$(LLVM_PATH)/lib -lLLVM -lc++
 
 # --- Files ---
-SRCS      := $(shell find . -name "*.cpp")
+SRCS      := beryl.cpp \
+						 $(wildcard be1/**/*.cpp) \
+						 $(wildcard struct-opt/*.cpp) \
+						 $(wildcard utils/*.cpp) \
+						 $(wildcard clparser/*.cpp)
 # This transforms the list of .cpp files into .o files
 OBJS      := $(SRCS:.cpp=.o)
 TARGET    := beryl

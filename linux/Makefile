@@ -1,10 +1,8 @@
-# This Makefile was copied from the homebrew clang version and modified for apple clang
+# This Makefile was copied from the apple clang macOS and more modifications
 
 # --- Compiler Selection ---
-LLVM_PATH   := /opt/homebrew/opt/llvm
-LLVM_CONFIG := $(LLVM_PATH)/bin/llvm-config
+LLVM_CONFIG := llvm-config
 CXX         := g++
-SDK_PATH    := $(shell xcrun --show-sdk-path)
 
 # --- LLVM Dynamic Flags ---
 LLVM_CXXFLAGS := $(shell $(LLVM_CONFIG) --cppflags)
@@ -13,7 +11,7 @@ LLVM_LDFLAGS  := $(shell $(LLVM_CONFIG) --ldflags --libs --system-libs)
 # --- Paths & Flags ---
 INCLUDES  := -I..
 
-CXXFLAGS  := -std=c++20 -O2 $(INCLUDES) $(LLVM_CXXFLAGS) -isysroot $(SDK_PATH)
+CXXFLAGS  := -std=c++20 -O2 $(INCLUDES) $(LLVM_CXXFLAGS)
 LDFLAGS   := -Wl,-rpath,$(LLVM_PATH)/lib $(LLVM_LDFLAGS) -lc++
 
 SRCS      := ../beryl.cpp \

@@ -12,7 +12,7 @@ LLVM_LDFLAGS  := $(shell $(LLVM_CONFIG) --ldflags --libs --system-libs)
 INCLUDES  := -I..
 
 CXXFLAGS  := -std=c++20 -O2 $(INCLUDES) $(LLVM_CXXFLAGS)
-LDFLAGS   := -Wl,-rpath,$(LLVM_PATH)/lib $(LLVM_LDFLAGS) -lc++
+LDFLAGS   := -Wl,-rpath,$(LLVM_PATH)/lib $(LLVM_LDFLAGS)
 
 SRCS      := ../beryl.cpp \
              $(wildcard ../be1/lexer/*.cpp) \

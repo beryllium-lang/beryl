@@ -13,6 +13,7 @@ objfiles
 compile_commands.json
 *.pyc
 /.cache
+/.cache/clangd/index
 /.venv
 
 

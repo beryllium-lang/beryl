@@ -5,7 +5,8 @@ AllowShortBlocksOnASingleLine: Always
 AllowShortFunctionsOnASingleLine: All
 AllowShortIfStatementsOnASingleLine: true
 AllowShortLoopsOnASingleLine: true
-AllowShortCaseExpressionOnASingleLine: true
+AlignAfterOpenBracket: AlwaysBreak
+AllowShortCaseLabelsOnASingleLine: true
 NamespaceIndentation: All
 CompactNamespaces: false
 DerivePointerAlignment: false

@@ -212,6 +212,22 @@ namespace beryl::be1 {
         visit_stmt(out, s);
       }
     }
+
+    void visit_class(std::ofstream& out, const ast::ClassDecl* class_) {
+      for (auto prop : class_->properties) {
+        visit_stmt(out, reinterpret_cast<const ast::Stmt*>(prop));
+      }
+      for (auto method : class_->methods) {
+        out << "  " << id(method) << " [label=\"Fn: " << method->name
+            << "\", shape=invhouse, color=blue, style=bold];\n";
+        for (auto p : method->params) visit_type(out, p->type, id(method), "param:" + p->name);
+        if (method->ret_type) visit_type(out, method->ret_type.value(), id(method), "returns");
+        if (method->body) {
+          out << "  " << id(method) << " -> " << id(method->body);
+          visit_block(out, method->body);
+        }
+      }
+    }
   } // namespace
 
   void write_ast_to_gv_file(const ast::Program* const prog, std::string_view path) {
@@ -224,7 +240,7 @@ namespace beryl::be1 {
               [&](ast::FunctionDecl* f) {
                 out << "  " << id(f) << " [label=\"Fn: " << f->name
                     << "\", shape=invhouse, color=blue, style=bold];\n";
-                for (auto& p : f->params) visit_type(out, p.type, id(f), "param:" + p.name);
+                for (auto& p : f->params) visit_type(out, p->type, id(f), "param:" + p->name);
                 if (f->ret_type) visit_type(out, f->ret_type.value(), id(f), "returns");
                 if (f->body) {
                   out << "  " << id(f) << " -> " << id(f->body);
@@ -244,7 +260,8 @@ namespace beryl::be1 {
                 out << "  " << id(i) << " [label=\"Import: " << i->module_name
                     << "\", shape=note];\n";
               },
-              [&](ast::VarDecl* v) { visit_stmt(out, reinterpret_cast<ast::Stmt*>(v)); }},
+              [&](ast::VarDecl* v) { visit_stmt(out, reinterpret_cast<ast::Stmt*>(v)); },
+              [&](ast::ClassDecl* c) { visit_class(out, c); }},
           el);
     }
     out << "}\n";

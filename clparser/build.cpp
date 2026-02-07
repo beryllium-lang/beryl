@@ -15,10 +15,12 @@
 namespace fs = std::filesystem;
 
 namespace beryl {
-  static bool directory_exists(const fs::path& path) { return fs::exists(path) && fs::is_directory(path); }
+  static bool directory_exists(const fs::path& path) {
+    return fs::exists(path) && fs::is_directory(path);
+  }
 
   void build(CompileArgs args) {
-    beryl::Arena alloc;
+    beryl::Arena alloc(128 * 1024 * 1024);
     if (!directory_exists("__bervenv__")) {
       std::cerr << "Bervenv does not exist. Would you like to create it? Y/n: ";
       char c;
@@ -66,8 +68,10 @@ namespace beryl {
         beryl::throw_arg_read_warning("Unknown compiler argument: " + arg);
     }
 
-    if (paths_to_by_file.size() == 0) beryl::throw_arg_read_error("There is no .by file to compile");
-    if (paths_to_by_file.size() > 1 && exec.has_value()) beryl::throw_arg_read_error("Cannot redirect output for multiple files");
+    if (paths_to_by_file.size() == 0)
+      beryl::throw_arg_read_error("There is no .by file to compile");
+    if (paths_to_by_file.size() > 1 && exec.has_value())
+      beryl::throw_arg_read_error("Cannot redirect output for multiple files");
 
     llvm::LLVMContext context;
 
@@ -104,7 +108,10 @@ namespace beryl {
         }
 
         be1::TokenStream tokens = beryl::be1::lex(buf, path.string());
-        for (const auto& token : tokens) { std::cout << token.to_string() << " at line " << token.line << ", col " << token.col << "\n"; }
+        for (const auto& token : tokens) {
+          std::cout << token.to_string() << " at line " << token.line << ", col " << token.col
+                    << "\n";
+        }
 
         be1::ast::Program* program = beryl::be1::parse(tokens, alloc);
       }

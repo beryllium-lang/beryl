@@ -196,15 +196,15 @@ namespace beryl::be1 {
 
     struct FunctionDecl {
       std::string name;
-      std::vector<Parameter> params;
+      std::vector<Parameter*> params;
       std::optional<TypeNode*> ret_type;
       Block* body;
     };
 
     struct ClassDecl {
       std::string name;
-      std::vector<VarDecl> properties;
-      std::vector<FunctionDecl> methods;
+      std::vector<VarDecl*> properties;
+      std::vector<FunctionDecl*> methods;
     };
 
     struct NamespaceDecl {
@@ -218,7 +218,8 @@ namespace beryl::be1 {
     };
 
     struct Program {
-      std::vector<std::variant<FunctionDecl*, VarDecl*, NamespaceDecl*, ImportDecl*>> body;
+      std::vector<std::variant<FunctionDecl*, VarDecl*, NamespaceDecl*, ImportDecl*, ClassDecl*>>
+          body;
     };
   } // namespace ast
 

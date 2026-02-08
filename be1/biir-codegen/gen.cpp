@@ -3,8 +3,8 @@
 #include <sstream>
 
 namespace beryl::be1 {
-  void ast_to_biir(const ast::Program* const prog) {
+  std::string ast_to_biir(const ast::Program* const prog) {
     std::ostringstream out;
-    //
+    return out.str();
   }
 } // namespace beryl::be1

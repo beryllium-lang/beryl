@@ -47,10 +47,11 @@ PACKAGES_JSON = os.path.join(BERVENV_DIR, "syspacks/packages.json")
 # utility to read installed packages
 
 
-def read_installed_packages() -> list:
+def read_installed_packages() -> list[str]:
     if not os.path.isdir(BERVENV_DIR):
         return []
     installed = []
+
     if os.path.isfile(PACKAGES_TXT):
         with open(PACKAGES_TXT, "r") as f:
             for line in f:
@@ -63,7 +64,7 @@ def read_installed_packages() -> list:
 # utility to write installed packages
 
 
-def write_installed_packages(installed):
+def write_installed_packages(installed: list[str]):
     if not os.path.isdir(BERVENV_DIR):
         print("Bervenv not created.")
         return

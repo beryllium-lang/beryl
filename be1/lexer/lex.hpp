@@ -190,7 +190,7 @@ namespace beryl::be1 {
       case REF: return "REF";
       case RESULT: return "RESULT";
       case TUP: return "TUP";
-      case HEXC: return "HEXC";
+      case OPT: return "OPT";
       case UNIC: return "UNIC";
       case TYPEOF: return "TYPEOF";
       case VALAT: return "VALAT";

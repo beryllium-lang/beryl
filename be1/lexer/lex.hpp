@@ -75,7 +75,7 @@ namespace beryl::be1 {
       REF,
       RESULT,
       TUP,
-      HEXC,
+      OPT,
       UNIC,
       TYPEOF,
       VALAT,
@@ -104,14 +104,17 @@ namespace beryl::be1 {
       OP,
       FRIEND,
       TYPE,
-      TRAIT
+      TRAIT,
+      COMB
     } type;
 
     std::string metadata;
     int line;
     int col;
 
-    bool operator==(const Token& other) const { return type == other.type && metadata == other.metadata; }
+    bool operator==(const Token& other) const {
+      return type == other.type && metadata == other.metadata;
+    }
     bool operator!=(const Token& other) const { return !(*this == other); }
     bool operator==(decltype(Token::VAR) t) const { return type == t; }
     bool operator!=(decltype(Token::VAR) t) const { return type != t; }
@@ -206,6 +209,13 @@ namespace beryl::be1 {
       case TRUE: return "TRUE";
       case FALSE: return "FALSE";
       case NULLPTR: return "NULLPTR";
+      case CLASS: return "CLASS";
+      case PUBLIC: return "PUBLIC";
+      case PRIVATE: return "PRIVATE";
+      case OP: return "OP";
+      case TYPE: return "TYPE";
+      case TRAIT: return "TRAIT";
+      case COMB: return "COMB";
       case EOF_TOKEN: return "EOF_TOKEN";
       default: return "INVALID_TOKEN";
       }
@@ -262,7 +272,9 @@ namespace beryl::be1 {
         return *this;
       }
 
-      bool operator==(const Iterator& other) const { return other.data == data && other.cursor == cursor; }
+      bool operator==(const Iterator& other) const {
+        return other.data == data && other.cursor == cursor;
+      }
       bool operator!=(const Iterator& other) const { return !operator==(other); }
 
       friend TokenStream;

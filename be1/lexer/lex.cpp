@@ -3,7 +3,7 @@
 #include <unordered_map>
 
 namespace beryl::be1 {
-  static const std::unordered_map<std::string_view, TokenType> keywords = {
+  static const std::unordered_map<std::string_view, TokenType> KEYWORDS = {
       {"var", Token::VAR},
       {"if", Token::IF},
       {"while", Token::WHILE},
@@ -45,7 +45,7 @@ namespace beryl::be1 {
       {"ref", Token::REF},
       {"result", Token::RESULT},
       {"tup", Token::TUP},
-      {"hexc", Token::HEXC},
+      {"opt", Token::OPT},
       {"unic", Token::UNIC},
       {"typeof", Token::TYPEOF},
       {"valat", Token::VALAT},
@@ -59,16 +59,20 @@ namespace beryl::be1 {
       {"else", Token::ELSE},
       {"trait", Token::TRAIT}};
 
-  static const std::unordered_map<char, TokenType> symbols = {
-      {';', Token::SEMI},       {'(', Token::OPEN_PAREN},  {'[', Token::OPEN_BRACKET}, {']', Token::CLOSE_BRACKET}, {')', Token::CLOSE_PAREN},
-      {'{', Token::OPEN_CURLY}, {'}', Token::CLOSE_CURLY}, {':', Token::COLON},        {',', Token::COMMA},         {'+', Token::PLUS},
-      {'-', Token::MINUS},      {'*', Token::ASTER},       {'/', Token::FORW_SLASH},   {'\\', Token::BACK_SLASH},   {'%', Token::MOD},
-      {'<', Token::LESS},       {'>', Token::GREATER},     {'=', Token::ASSIGN},       {'!', Token::NOT},           {'.', Token::DOT}};
+  static const std::unordered_map<char, TokenType> SYMBOLS = {
+      {';', Token::SEMI},          {'(', Token::OPEN_PAREN},  {'[', Token::OPEN_BRACKET},
+      {']', Token::CLOSE_BRACKET}, {')', Token::CLOSE_PAREN}, {'{', Token::OPEN_CURLY},
+      {'}', Token::CLOSE_CURLY},   {':', Token::COLON},       {',', Token::COMMA},
+      {'+', Token::PLUS},          {'-', Token::MINUS},       {'*', Token::ASTER},
+      {'/', Token::FORW_SLASH},    {'\\', Token::BACK_SLASH}, {'%', Token::MOD},
+      {'<', Token::LESS},          {'>', Token::GREATER},     {'=', Token::ASSIGN},
+      {'!', Token::NOT},           {'.', Token::DOT},         {'|', Token::COMB}};
 
-  static const std::unordered_map<std::string, TokenType> double_symbols = {
-      {"&&", Token::AND},           {"||", Token::OR},      {"==", Token::EQ},        {"!=", Token::NOT_EQ},
-      {"<<", Token::LEFT_SHIFT},    {"+=", Token::PLUS_EQ}, {"-=", Token::MINUS_EQ},  {"*=", Token::ASTER_EQ},
-      {"/=", Token::FORW_SLASH_EQ}, {"%=", Token::MOD_EQ},  {"++", Token::PLUS_PLUS}, {"--", Token::MINUS_MINUS}};
+  static const std::unordered_map<std::string_view, TokenType> DOUBLE_SYMBOLS = {
+      {"&&", Token::AND},      {"||", Token::OR},         {"==", Token::EQ},
+      {"!=", Token::NOT_EQ},   {"<<", Token::LEFT_SHIFT}, {"+=", Token::PLUS_EQ},
+      {"-=", Token::MINUS_EQ}, {"*=", Token::ASTER_EQ},   {"/=", Token::FORW_SLASH_EQ},
+      {"%=", Token::MOD_EQ},   {"++", Token::PLUS_PLUS},  {"--", Token::MINUS_MINUS}};
 
   const Token& TokenStream::advance() {
     if (!has_next()) beryl::throw_lex_error("End of token stream reached", -1, -1);
@@ -182,7 +186,9 @@ namespace beryl::be1 {
             beryl::throw_lex_error("Unknown escape sequence in string literal", line, col);
           }
         }
-        if (cursor >= buf.length()) { beryl::throw_lex_error("Unterminated string literal", tok.line, tok.col); }
+        if (cursor >= buf.length()) {
+          beryl::throw_lex_error("Unterminated string literal", tok.line, tok.col);
+        }
         ++cursor;
         ++col;
         tokens.push_back(tok);
@@ -218,7 +224,9 @@ namespace beryl::be1 {
           ++cursor;
           ++col;
         }
-        if (peek() != '\'') { beryl::throw_lex_error("Unterminated character literal", tok.line, tok.col); }
+        if (peek() != '\'') {
+          beryl::throw_lex_error("Unterminated character literal", tok.line, tok.col);
+        }
         ++cursor;
         ++col;
         tokens.push_back(tok);
@@ -240,7 +248,7 @@ namespace beryl::be1 {
         tok.col = start_col;
         tok.metadata = s;
 
-        if (auto it = keywords.find(s); it != keywords.cend())
+        if (auto it = KEYWORDS.find(s); it != KEYWORDS.cend())
           tok.type = it->second;
         else
           tok.type = Token::IDENT;
@@ -263,7 +271,9 @@ namespace beryl::be1 {
         }
         while (std::isdigit(peek()) || peek() == '.') {
           if (peek() == '.') {
-            if (is_float) { beryl::throw_lex_error("Multiple decimal points in number literal", line, col); }
+            if (is_float) {
+              beryl::throw_lex_error("Multiple decimal points in number literal", line, col);
+            }
             is_float = true;
           }
           num_str += peek();
@@ -279,7 +289,7 @@ namespace beryl::be1 {
       // Symbols
       bool matched_symbol = false;
       if (cursor + 1 < buf.length()) {
-        std::string potential_double = {peek(), peek(1)};
+        std::string potential_double{peek(), peek(1)};
         if (potential_double == ">>") {
           for (int i = 0; i < 2; ++i) {
             Token tok;
@@ -293,7 +303,7 @@ namespace beryl::be1 {
           col += 2;
           matched_symbol = true;
         }
-        if (auto it = double_symbols.find(potential_double); it != double_symbols.cend()) {
+        if (auto it = DOUBLE_SYMBOLS.find(potential_double); it != DOUBLE_SYMBOLS.cend()) {
           Token tok;
           tok.type = it->second;
           tok.line = line;
@@ -307,7 +317,7 @@ namespace beryl::be1 {
       }
 
       if (!matched_symbol) {
-        if (auto it = symbols.find(peek()); it != symbols.cend()) {
+        if (auto it = SYMBOLS.find(peek()); it != SYMBOLS.cend()) {
           Token tok;
           tok.type = it->second;
           tok.line = line;
@@ -324,7 +334,9 @@ namespace beryl::be1 {
 
       if (matched_symbol) { continue; }
 
-      if (cursor == past_cursor) { beryl::throw_lex_error("Tokenizer stopped progress", line, col); }
+      if (cursor == past_cursor) {
+        beryl::throw_lex_error("Tokenizer stopped progress", line, col);
+      }
       past_cursor = cursor;
     }
     tokens.push_back(Token{.type = Token::EOF_TOKEN, .line = line, .col = col});

@@ -2,17 +2,48 @@ package cmd
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/spf13/cobra"
 )
+
+func readDirectories(dirPath string) ([]string, error) {
+	folders := []string{}
+	entries, err := os.ReadDir(dirPath)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, entry := range entries {
+		if entry.IsDir() {
+			folders = append(folders, entry.Name())
+		}
+	}
+
+	return folders, nil
+}
 
 // listCmd represents the list command
 var listCmd = &cobra.Command{
 	Use:   "list",
 	Short: "Lists all the installed packages",
-	Args:  cobra.MaximumNArgs(0),
-	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("list called")
+	Args:  cobra.NoArgs,
+	RunE: func(cmd *cobra.Command, args []string) error {
+		directoryPath := "__bervenv__/syspacks"
+		packages, err := readDirectories(directoryPath)
+		if err != nil {
+			return fmt.Errorf("failed to list packages in %s: %w", directoryPath, err)
+		}
+
+		if len(packages) == 0 {
+			fmt.Println("No packages installed")
+			return nil
+		}
+
+		for _, pack := range packages {
+			fmt.Println(pack)
+		}
+		return nil
 	},
 }
 

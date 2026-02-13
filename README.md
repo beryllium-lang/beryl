@@ -61,3 +61,5 @@ Package manager:
 cd mineraloil
 go build -o mineraloil main.go
 ```
+
+The executable is at ./mineraloil.

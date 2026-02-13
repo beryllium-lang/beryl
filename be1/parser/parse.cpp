@@ -59,7 +59,8 @@ namespace beryl::be1 {
         tokens.advance();
         continue;
       }
-      if (tokens.peek() == Token::FUNC) {
+      if (tokens.peek() == Token::FUNC ||
+          (tokens.peek() == Token::PUBLISH && tokens.peek() == Token::FUNC)) {
         tree->body.emplace_back(construct_func(tokens, arena));
         tokens.advance();
         continue;
@@ -69,12 +70,14 @@ namespace beryl::be1 {
         tokens.advance();
         continue;
       }
-      if (tokens.peek() == Token::VAR) {
+      if (tokens.peek() == Token::VAR ||
+          (tokens.peek() == Token::PUBLISH && tokens.peek(1) == Token::VAR)) {
         tree->body.emplace_back(construct_var(tokens, arena));
         tokens.advance();
         continue;
       }
-      if (tokens.peek() == Token::IMPORT) {
+      if (tokens.peek() == Token::IMPORT ||
+          (tokens.peek() == Token::PUBLISH && tokens.peek(1) == Token::IMPORT)) {
         tree->body.emplace_back(construct_import(tokens, arena));
         tokens.advance();
         continue;

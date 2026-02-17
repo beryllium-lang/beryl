@@ -6,9 +6,11 @@ package cmd
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"os"
 	"path"
+	"slices"
 
 	"github.com/spf13/cobra"
 )
@@ -22,10 +24,17 @@ type Dependency struct {
 	Versions []string
 }
 
+type ArchOS struct {
+	OS           string `json:"os"`
+	Architecture string `json:"architecture"`
+}
+
 type PackageMetadata struct {
 	Version            string       `json:"version"`
 	BerylliumStandards []string     `json:"beryllium_standards"`
 	Dependencies       []Dependency `json:"dependencies"`
+	Description        string       `json:"description"`
+	ArchOSes           []ArchOS     `json:"arch_os"`
 }
 
 // queryCmd represents the query command
@@ -46,7 +55,15 @@ var queryCmd = &cobra.Command{
 				return fmt.Errorf("Invalid json in %s: %w", pack, err)
 			}
 
+			if pkg.Version == "" || len(pkg.BerylliumStandards) == 0 || len(pkg.Dependencies) == 0 {
+				return errors.New("Malformed pkg.json")
+			}
+
 			fmt.Printf("Package %s\n", pack)
+			if pkg.Description != "" {
+				fmt.Printf("%s\n", pkg.Description)
+			}
+
 			fmt.Printf("Version: %s\n", pkg.Version)
 			fmt.Println("Beryllium Standards: ")
 			for i := 0; i < len(pkg.BerylliumStandards); i += 2 {
@@ -62,6 +79,19 @@ var queryCmd = &cobra.Command{
 					if i+1 < len(dep.Versions) {
 						fmt.Printf("        %s-%s\n", dep.Versions[i], dep.Versions[i+1])
 					}
+				}
+			}
+
+			if pkg.ArchOSes != nil {
+				validOSes := [...]string{"macOS", "windows", "linux"}
+				validArchitectures := [...]string{"ARM", "x86", "x86-64", "ARM64"}
+				fmt.Println("Supported systems: ")
+				for _, archOS := range pkg.ArchOSes {
+					if !(slices.Contains(validOSes[:], archOS.OS) && slices.Contains(validArchitectures[:], archOS.Architecture)) {
+						return errors.New("Malformed pkg.json")
+					}
+
+					fmt.Printf("    OS: %s, Architecture: %s\n", archOS.OS, archOS.Architecture)
 				}
 			}
 		}

@@ -1,9 +1,9 @@
 Language: Cpp
 IndentWidth: 2
-ColumnLimit: 100
-AllowShortBlocksOnASingleLine: Always
-AllowShortFunctionsOnASingleLine: All
-AllowShortIfStatementsOnASingleLine: true
+ColumnLimit: 150
+AllowShortBlocksOnASingleLine: Never
+AllowShortFunctionsOnASingleLine: InlineOnly
+AllowShortIfStatementsOnASingleLine: OnlyFirstIf
 AllowShortLoopsOnASingleLine: true
 AlignAfterOpenBracket: AlwaysBreak
 AllowShortCaseLabelsOnASingleLine: true

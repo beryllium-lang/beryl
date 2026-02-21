@@ -1,3 +1,4 @@
+#include "be1/biir-codegen/gen.hpp"
 #include "be1/lexer/lex.hpp"
 #include "be1/parser/parse.hpp"
 #include "clparser.hpp"
@@ -109,6 +110,7 @@ namespace beryl {
 
         be1::TokenStream tokens = beryl::be1::lex(buf, path.string());
         be1::ast::Program* program = beryl::be1::parse(tokens, alloc);
+        std::string biir = be1::ast_to_biir(program);
       }
     }
   }

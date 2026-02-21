@@ -124,10 +124,9 @@ namespace beryl::be1 {
     };
     struct Expr {
       std::variant<
-          IntLit*, FloatLit*, StrLit*, CharLit*, BoolLit*, VarRef*, AddExpr*, SubExpr*, MulExpr*,
-          DivExpr*, ModExpr*, EqExpr*, NotEqExpr*, LessExpr*, GreaterExpr*, AndExpr*, OrExpr*,
-          NormalAssign*, AddAssign*, SubAssign*, MulAssign*, DivAssign*, ModAssign*, ArrayAccess*,
-          CastExpr*, CallExpr*, UnaryExpr*, TernaryExpr*>
+          IntLit*, FloatLit*, StrLit*, CharLit*, BoolLit*, VarRef*, AddExpr*, SubExpr*, MulExpr*, DivExpr*, ModExpr*, EqExpr*, NotEqExpr*, LessExpr*,
+          GreaterExpr*, AndExpr*, OrExpr*, NormalAssign*, AddAssign*, SubAssign*, MulAssign*, DivAssign*, ModAssign*, ArrayAccess*, CastExpr*,
+          CallExpr*, UnaryExpr*, TernaryExpr*>
           data;
     };
 
@@ -182,10 +181,7 @@ namespace beryl::be1 {
     };
 
     struct Stmt {
-      std::variant<
-          VarDecl*, IfStmt*, WhileLoop*, ForLoop*, ForEach*, RepeatLoop*, WaitStmt*, ExitStmt*,
-          ReturnStmt*, Block*, Expr*>
-          data;
+      std::variant<VarDecl*, IfStmt*, WhileLoop*, ForLoop*, ForEach*, RepeatLoop*, WaitStmt*, ExitStmt*, ReturnStmt*, Block*, Expr*> data;
     };
 
     struct Parameter {
@@ -201,15 +197,26 @@ namespace beryl::be1 {
       Block* body;
     };
 
+    struct TraitDecl {
+      std::string trait_name;
+      std::vector<FunctionDecl*> methods;
+    };
+
     struct ClassDecl {
       std::string name;
+      std::vector<std::string> trait_names;
       std::vector<VarDecl*> properties;
       std::vector<FunctionDecl*> methods;
     };
 
+    struct EnumDecl {
+      std::string enum_name;
+      std::vector<std::string> entities;
+    };
+
     struct NamespaceDecl {
       std::string name;
-      std::vector<std::variant<FunctionDecl*, VarDecl*, NamespaceDecl*, ClassDecl*>> members;
+      std::vector<std::variant<FunctionDecl*, VarDecl*, NamespaceDecl*, ClassDecl*, TraitDecl*, EnumDecl*>> members;
     };
 
     struct ImportDecl {
@@ -218,8 +225,7 @@ namespace beryl::be1 {
     };
 
     struct Program {
-      std::vector<std::variant<FunctionDecl*, VarDecl*, NamespaceDecl*, ImportDecl*, ClassDecl*>>
-          body;
+      std::vector<std::variant<FunctionDecl*, VarDecl*, NamespaceDecl*, ImportDecl*, ClassDecl*, EnumDecl*, TraitDecl*>> body;
     };
   } // namespace ast
 

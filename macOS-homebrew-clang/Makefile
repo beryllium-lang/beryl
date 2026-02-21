@@ -21,6 +21,7 @@ LDFLAGS   := -Wl,-rpath,$(LLVM_PATH)/lib $(LLVM_LDFLAGS) -lc++
 SRCS      := ../beryl.cpp \
              $(wildcard ../be1/lexer/*.cpp) \
              $(wildcard ../be1/parser/*.cpp) \
+             $(wildcard ../be1/biir-codegen/*.cpp) \
              $(wildcard ../struct-opt/*.cpp) \
              $(wildcard ../utils/*.cpp) \
              $(wildcard ../clparser/*.cpp)

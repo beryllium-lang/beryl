@@ -18,6 +18,8 @@ func start(args: dynarr<string>) {
 
   var char_test = 'd';
 
+  var res = 3 - 2;
+
   var nest_gen_check: dynarr<unsafeptr<dynarr<int>>>;
   exit 0;
 }

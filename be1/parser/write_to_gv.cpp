@@ -2,33 +2,28 @@
 just debugging */
 
 #include "parse.hpp"
+#include <cstdint>
 #include <fstream>
 #include <string>
 #include <variant>
-#include <cstdint>
 
 namespace beryl::be1 {
   namespace {
-    template <class... Ts> struct overloaded : Ts... {
+    template <class... Ts> struct Overloaded : Ts... {
       using Ts::operator()...;
     };
-    template <class... Ts> overloaded(Ts...) -> overloaded<Ts...>;
+    template <class... Ts> Overloaded(Ts...) -> Overloaded<Ts...>;
 
     inline std::string id(const void* ptr) {
       return "n" + std::to_string(reinterpret_cast<uintptr_t>(ptr));
     }
 
     template <typename T> std::string get_op_label() {
-      if constexpr (std::is_same_v<T, ast::AddExpr> || std::is_same_v<T, ast::AddAssign>)
-        return "+";
-      if constexpr (std::is_same_v<T, ast::SubExpr> || std::is_same_v<T, ast::SubAssign>)
-        return "-";
-      if constexpr (std::is_same_v<T, ast::MulExpr> || std::is_same_v<T, ast::MulAssign>)
-        return "*";
-      if constexpr (std::is_same_v<T, ast::DivExpr> || std::is_same_v<T, ast::DivAssign>)
-        return "/";
-      if constexpr (std::is_same_v<T, ast::ModExpr> || std::is_same_v<T, ast::ModAssign>)
-        return "%";
+      if constexpr (std::is_same_v<T, ast::AddExpr> || std::is_same_v<T, ast::AddAssign>) return "+";
+      if constexpr (std::is_same_v<T, ast::SubExpr> || std::is_same_v<T, ast::SubAssign>) return "-";
+      if constexpr (std::is_same_v<T, ast::MulExpr> || std::is_same_v<T, ast::MulAssign>) return "*";
+      if constexpr (std::is_same_v<T, ast::DivExpr> || std::is_same_v<T, ast::DivAssign>) return "/";
+      if constexpr (std::is_same_v<T, ast::ModExpr> || std::is_same_v<T, ast::ModAssign>) return "%";
       if constexpr (std::is_same_v<T, ast::EqExpr>) return "==";
       if constexpr (std::is_same_v<T, ast::NotEqExpr>) return "!=";
       if constexpr (std::is_same_v<T, ast::LessExpr>) return "<";
@@ -42,61 +37,36 @@ namespace beryl::be1 {
     void visit_stmt(std::ofstream& out, const ast::Stmt* stmt);
     void visit_expr(std::ofstream& out, const ast::Expr* expr);
     void visit_block(std::ofstream& out, const ast::Block* block);
-    void visit_type(
-        std::ofstream& out, const ast::TypeNode* type, const std::string& parent_id,
-        std::string_view label);
+    void visit_type(std::ofstream& out, const ast::TypeNode* type, const std::string& parent_id, std::string_view label);
 
-    void visit_type(
-        std::ofstream& out, const ast::TypeNode* type, const std::string& parent_id,
-        std::string_view label) {
+    void visit_type(std::ofstream& out, const ast::TypeNode* type, const std::string& parent_id, std::string_view label) {
       if (!type) return;
       std::string node_id = id(type);
-      std::string name = std::visit(
-          overloaded{
-              [](const std::string& s) { return s; },
-              [](ast::GenericType* g) { return g->base_name + "<...>"; }},
-          type->specifier);
+      std::string name =
+          std::visit(Overloaded{[](const std::string& s) { return s; }, [](ast::GenericType* g) { return g->base_name + "<...>"; }}, type->specifier);
 
-      out << "  " << node_id << " [label=\"Type: " << name << (type->is_mut ? " mut" : "")
-          << (type->is_ref ? "&" : "") << "\", color=purple, shape=box, style=dashed];\n";
-      out << "  " << parent_id << " -> " << node_id << " [label=\"" << label
-          << "\", style=dotted];\n";
+      out << "  " << node_id << " [label=\"Type: " << name << (type->is_mut ? " mut" : "") << (type->is_ref ? "&" : "")
+          << "\", color=purple, shape=box, style=dashed];\n";
+      out << "  " << parent_id << " -> " << node_id << " [label=\"" << label << "\", style=dotted];\n";
     }
 
     void visit_expr(std::ofstream& out, const ast::Expr* expr) {
       if (!expr) return;
       std::visit(
-          overloaded{
-              [&](ast::IntLit* l) {
-                out << "  " << id(l) << " [label=\"" << l->value << "\", shape=ellipse];\n";
-              },
-              [&](ast::FloatLit* l) {
-                out << "  " << id(l) << " [label=\"" << l->value << "\", shape=ellipse];\n";
-              },
-              [&](ast::StrLit* l) {
-                out << "  " << id(l) << " [label=\"\\\"" << l->value
-                    << "\\\"\", shape=ellipse, color=orange];\n";
-              },
-              [&](ast::CharLit* l) {
-                out << "  " << id(l) << " [label=\"'" << l->value
-                    << "'\", shape=ellipse, color=orange];\n";
-              },
-              [&](ast::BoolLit* l) {
-                out << "  " << id(l) << " [label=\"" << (l->value ? "true" : "false")
-                    << "\", shape=diamond, color=green];\n";
-              },
-              [&](ast::VarRef* v) {
-                out << "  " << id(v) << " [label=\"ID: " << v->name
-                    << "\", shape=none, fontcolor=blue];\n";
-              },
+          Overloaded{
+              [&](ast::IntLit* l) { out << "  " << id(l) << " [label=\"" << l->value << "\", shape=ellipse];\n"; },
+              [&](ast::FloatLit* l) { out << "  " << id(l) << " [label=\"" << l->value << "\", shape=ellipse];\n"; },
+              [&](ast::StrLit* l) { out << "  " << id(l) << " [label=\"\\\"" << l->value << "\\\"\", shape=ellipse, color=orange];\n"; },
+              [&](ast::CharLit* l) { out << "  " << id(l) << " [label=\"'" << l->value << "'\", shape=ellipse, color=orange];\n"; },
+              [&](ast::BoolLit* l) { out << "  " << id(l) << " [label=\"" << (l->value ? "true" : "false") << "\", shape=diamond, color=green];\n"; },
+              [&](ast::VarRef* v) { out << "  " << id(v) << " [label=\"ID: " << v->name << "\", shape=none, fontcolor=blue];\n"; },
               [&](ast::UnaryExpr* u) {
                 out << "  " << id(u) << " [label=\"Unary: " << u->op.to_string() << "\"];\n";
                 out << "  " << id(u) << " -> " << id(u->operand) << ";\n";
                 visit_expr(out, u->operand);
               },
               [&](ast::CallExpr* c) {
-                out << "  " << id(c) << " [label=\"Call: " << c->name
-                    << "()\", shape=component];\n";
+                out << "  " << id(c) << " [label=\"Call: " << c->name << "()\", shape=component];\n";
                 for (auto* arg : c->args) {
                   out << "  " << id(c) << " -> " << id(arg) << ";\n";
                   visit_expr(out, arg);
@@ -110,8 +80,7 @@ namespace beryl::be1 {
                 visit_expr(out, a->index);
               },
               [&](ast::CastExpr* c) {
-                out << "  " << id(c) << " [label=\"Cast" << (c->unsafe ? " (unsafe)" : "")
-                    << "\", shape=doublecircle];\n";
+                out << "  " << id(c) << " [label=\"Cast" << (c->unsafe ? " (unsafe)" : "") << "\", shape=doublecircle];\n";
                 out << "  " << id(c) << " -> " << id(c->expr);
                 visit_expr(out, c->expr);
                 visit_type(out, c->to, id(c), "to");
@@ -127,8 +96,7 @@ namespace beryl::be1 {
               },
               [&](auto* bin) {
                 using T = std::remove_pointer_t<decltype(bin)>;
-                out << "  " << id(bin) << " [label=\"" << get_op_label<T>()
-                    << "\", shape=circle, style=filled, fillcolor=white];\n";
+                out << "  " << id(bin) << " [label=\"" << get_op_label<T>() << "\", shape=circle, style=filled, fillcolor=white];\n";
                 out << "  " << id(bin) << " -> " << id(bin->left) << " [label=\"L\"];\n";
                 out << "  " << id(bin) << " -> " << id(bin->right) << " [label=\"R\"];\n";
                 visit_expr(out, bin->left);
@@ -140,7 +108,7 @@ namespace beryl::be1 {
     void visit_stmt(std::ofstream& out, const ast::Stmt* stmt) {
       if (!stmt) return;
       std::visit(
-          overloaded{
+          Overloaded{
               [&](ast::VarDecl* d) {
                 out << "  " << id(d) << " [label=\"Decl: " << d->name << "\", shape=rect];\n";
                 if (d->type) visit_type(out, d->type.value(), id(d), "type");
@@ -151,63 +119,61 @@ namespace beryl::be1 {
               },
               [&](ast::IfStmt* i) {
                 out << "  " << id(i) << " [label=\"If\", shape=diamond];\n";
-                out << "  " << id(i) << " -> " << id(i->cond)
-                    << " [label=\"?\"]; visit_expr(out, i->cond);\n";
-                out << "  " << id(i) << " -> " << id(i->then_b)
-                    << " [label=\"then\"]; visit_block(out, i->then_b);\n";
+                out << "  " << id(i) << " -> " << id(i->cond) << " [label=\"?\"];\n";
+                visit_expr(out, i->cond);
+
+                out << "  " << id(i) << " -> " << id(i->then_b) << " [label=\"then\"];\n";
+                visit_block(out, i->then_b);
+
                 for (auto& elseif : i->else_if_bs) {
                   out << "  " << id(i) << " -> " << id(elseif.body) << " [label=\"else_if\"];\n";
                   visit_expr(out, elseif.cond);
                   visit_block(out, elseif.body);
                 }
                 if (i->else_b) {
-                  out << "  " << id(i) << " -> " << id(i->else_b.value())
-                      << " [label=\"else\"]; visit_block(out, i->else_b.value())";
+                  out << "  " << id(i) << " -> " << id(i->else_b.value()) << " [label=\"else\"];\n";
+                  visit_block(out, i->else_b.value());
                 }
               },
               [&](ast::WhileLoop* w) {
-                out << "  " << id(w) << " [label=\"" << (w->is_do ? "Do-While" : "While")
-                    << "\", shape=parallelogram];\n";
-                out << "  " << id(w) << " -> " << id(w->cond);
+                out << "  " << id(w) << " [label=\"" << (w->is_do ? "Do-While" : "While") << "\", shape=parallelogram];\n";
+                out << "  " << id(w) << " -> " << id(w->cond) << ";\n";
                 visit_expr(out, w->cond);
-                out << "  " << id(w) << " -> " << id(w->body);
+                out << "  " << id(w) << " -> " << id(w->body) << ";\n";
                 visit_block(out, w->body);
               },
               [&](ast::ForLoop* f) {
                 out << "  " << id(f) << " [label=\"For\", shape=parallelogram];\n";
                 std::visit(
                     [&](auto* item) {
-                      out << "  " << id(f) << " -> " << id(item) << " [label=\"init\"];";
-                      if constexpr (std::is_same_v<decltype(item), ast::VarDecl*>)
-                        visit_stmt(out, reinterpret_cast<ast::Stmt*>(item));
+                      out << "  " << id(f) << " -> " << id(item) << " [label=\"init\"];\n";
+                      if constexpr (std::is_same_v<std::decay_t<decltype(item)>, ast::VarDecl*>) visit_stmt(out, reinterpret_cast<ast::Stmt*>(item));
                       else
                         visit_expr(out, item);
                     },
                     f->init);
-                out << "  " << id(f) << " -> " << id(f->cond)
-                    << " [label=\"cond\"]; visit_expr(out, f->cond);\n";
-                out << "  " << id(f) << " -> " << id(f->step)
-                    << " [label=\"step\"]; visit_expr(out, f->step);\n";
-                out << "  " << id(f) << " -> " << id(f->body);
+                out << "  " << id(f) << " -> " << id(f->cond) << " [label=\"cond\"];\n";
+                visit_expr(out, f->cond);
+                out << "  " << id(f) << " -> " << id(f->step) << " [label=\"step\"];\n";
+                visit_expr(out, f->step);
+                out << "  " << id(f) << " -> " << id(f->body) << ";\n";
                 visit_block(out, f->body);
               },
               [&](ast::ReturnStmt* r) {
                 out << "  " << id(r) << " [label=\"Return\", shape=trapezium, color=red];\n";
                 if (r->val) {
-                  out << "  " << id(r) << " -> " << id(r->val.value());
+                  out << "  " << id(r) << " -> " << id(r->val.value()) << ";\n";
                   visit_expr(out, r->val.value());
                 }
               },
-              [&](ast::Block* b) { visit_block(out, b); },
-              [&](ast::Expr* e) { visit_expr(out, e); },
+              [&](ast::Block* b) { visit_block(out, b); }, [&](ast::Expr* e) { visit_expr(out, e); },
               [&](auto* other) { out << "  " << id(other) << " [label=\"Other Stmt\"];\n"; }},
           stmt->data);
     }
 
     void visit_block(std::ofstream& out, const ast::Block* block) {
       if (!block) return;
-      out << "  " << id(block)
-          << " [label=\"{Block}\", shape=box, style=filled, fillcolor=lightyellow];\n";
+      out << "  " << id(block) << " [label=\"{Block}\", shape=box, style=filled, fillcolor=lightyellow];\n";
       for (auto* s : block->body) {
         out << "  " << id(block) << " -> " << id(s) << ";\n";
         visit_stmt(out, s);
@@ -219,14 +185,35 @@ namespace beryl::be1 {
         visit_stmt(out, reinterpret_cast<const ast::Stmt*>(prop));
       }
       for (auto method : class_->methods) {
-        out << "  " << id(method) << " [label=\"Fn: " << method->name
-            << "\", shape=invhouse, color=blue, style=bold];\n";
+        out << "  " << id(method) << " [label=\"Fn: " << method->name << "\", shape=invhouse, color=blue, style=bold];\n";
         for (auto p : method->params) visit_type(out, p->type, id(method), "param:" + p->name);
         if (method->ret_type) visit_type(out, method->ret_type.value(), id(method), "returns");
-        if (method->body) {
-          out << "  " << id(method) << " -> " << id(method->body);
-          visit_block(out, method->body);
-        }
+        out << "  " << id(method) << " -> " << id(method->body);
+        visit_block(out, method->body);
+      }
+    }
+
+    void visit_trait(std::ofstream& out, const ast::TraitDecl* trait) {
+      for (auto method : trait->methods) {
+        out << "  " << id(method) << " [label=\"Fn: " << method->name << "\", shape=invhouse, color=blue, style=bold];\n";
+        for (auto p : method->params) visit_type(out, p->type, id(method), "param:" + p->name);
+        if (method->ret_type) visit_type(out, method->ret_type.value(), id(method), "returns");
+        out << "  " << id(method) << " -> " << id(method->body);
+      }
+    }
+
+    void visit_enum(std::ofstream& out, const ast::EnumDecl* enum_) {
+      if (!enum_) return;
+
+      std::string enum_id = id(enum_);
+      out << "  " << enum_id << " [label=\"Enum: " << enum_->enum_name << "\", shape=hexagon, color=darkgreen, style=bold];\n";
+
+      for (const auto& variant_name : enum_->entities) {
+        std::string variant_id = enum_id;
+        variant_id += "_";
+        variant_id += variant_name;
+        out << "  " << variant_id << " [label=\"" << variant_name << "\", shape=cds, color=darkgreen];\n";
+        out << "  " << enum_id << " -> " << variant_id << ";\n";
       }
     }
   } // namespace
@@ -237,10 +224,9 @@ namespace beryl::be1 {
     out << "digraph BerylliumAST {\n  rankdir=TB;\n  node [fontname=\"Courier\", fontsize=10];\n";
     for (auto el : prog->body) {
       std::visit(
-          overloaded{
+          Overloaded{
               [&](ast::FunctionDecl* f) {
-                out << "  " << id(f) << " [label=\"Fn: " << f->name
-                    << "\", shape=invhouse, color=blue, style=bold];\n";
+                out << "  " << id(f) << " [label=\"Fn: " << f->name << "\", shape=invhouse, color=blue, style=bold];\n";
                 for (auto& p : f->params) visit_type(out, p->type, id(f), "param:" + p->name);
                 if (f->ret_type) visit_type(out, f->ret_type.value(), id(f), "returns");
                 if (f->body) {
@@ -249,20 +235,14 @@ namespace beryl::be1 {
                 }
               },
               [&](ast::NamespaceDecl* n) {
-                out << "  " << id(n) << " [label=\"Namespace: " << n->name
-                    << "\", shape=folder, color=red];\n";
+                out << "  " << id(n) << " [label=\"Namespace: " << n->name << "\", shape=folder, color=red];\n";
                 for (auto m : n->members) {
-                  std::visit(
-                      [&](auto* member) { out << "  " << id(n) << " -> " << id(member) << ";"; },
-                      m);
+                  std::visit([&](auto* member) { out << "  " << id(n) << " -> " << id(member) << ";"; }, m);
                 }
               },
-              [&](ast::ImportDecl* i) {
-                out << "  " << id(i) << " [label=\"Import: " << i->module_name
-                    << "\", shape=note];\n";
-              },
-              [&](ast::VarDecl* v) { visit_stmt(out, reinterpret_cast<ast::Stmt*>(v)); },
-              [&](ast::ClassDecl* c) { visit_class(out, c); }},
+              [&](ast::ImportDecl* i) { out << "  " << id(i) << " [label=\"Import: " << i->module_name << "\", shape=note];\n"; },
+              [&](ast::VarDecl* v) { visit_stmt(out, reinterpret_cast<ast::Stmt*>(v)); }, [&](ast::ClassDecl* c) { visit_class(out, c); },
+              [&](ast::TraitDecl* t) { visit_trait(out, t); }, [&](ast::EnumDecl* e) { visit_enum(out, e); }},
           el);
     }
     out << "}\n";

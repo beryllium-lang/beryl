@@ -1,11 +1,12 @@
 #pragma once
+#include <cstdint>
 #include <string>
 #include <string_view>
 #include <vector>
 
 namespace beryl::be1 {
   struct Token {
-    enum {
+    enum : uint8_t {
       SEMI,
       INT_LIT,
       FLOAT_LIT,
@@ -75,7 +76,8 @@ namespace beryl::be1 {
       REF,
       RESULT,
       TUP,
-      HEXC,
+      OPT,
+      VARIANT,
       UNIC,
       TYPEOF,
       VALAT,
@@ -104,14 +106,17 @@ namespace beryl::be1 {
       OP,
       FRIEND,
       TYPE,
-      TRAIT
+      TRAIT,
+      COMB,
+      PUBLISH,
+      ENUM
     } type;
 
     std::string metadata;
     int line;
     int col;
 
-    bool operator==(const Token& other) const { return type == other.type && metadata == other.metadata; }
+    bool operator==(const Token& other) const { return operator==(other); }
     bool operator!=(const Token& other) const { return !(*this == other); }
     bool operator==(decltype(Token::VAR) t) const { return type == t; }
     bool operator!=(decltype(Token::VAR) t) const { return type != t; }
@@ -187,7 +192,8 @@ namespace beryl::be1 {
       case REF: return "REF";
       case RESULT: return "RESULT";
       case TUP: return "TUP";
-      case HEXC: return "HEXC";
+      case OPT: return "OPT";
+      case VARIANT: return "VARIANT";
       case UNIC: return "UNIC";
       case TYPEOF: return "TYPEOF";
       case VALAT: return "VALAT";
@@ -205,7 +211,16 @@ namespace beryl::be1 {
       case FROM: return "FROM";
       case TRUE: return "TRUE";
       case FALSE: return "FALSE";
-      case NULLPTR: return "NULLPTR";
+      case NULLPTR: return "NIL";
+      case CLASS: return "CLASS";
+      case PUBLIC: return "PUBLIC";
+      case PRIVATE: return "PRIVATE";
+      case OP: return "OP";
+      case TYPE: return "TYPE";
+      case TRAIT: return "TRAIT";
+      case COMB: return "COMB";
+      case PUBLISH: return "PUBLISH";
+      case ENUM: return "ENUM";
       case EOF_TOKEN: return "EOF_TOKEN";
       default: return "INVALID_TOKEN";
       }

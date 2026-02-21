@@ -17,10 +17,10 @@ LDFLAGS   := -Wl,-rpath,$(LLVM_PATH)/lib $(LLVM_LDFLAGS)
 SRCS      := ../beryl.cpp \
              $(wildcard ../be1/lexer/*.cpp) \
              $(wildcard ../be1/parser/*.cpp) \
-						 $(wildcard ../be1/biir-codegen/*.cpp) \
              $(wildcard ../struct-opt/*.cpp) \
              $(wildcard ../utils/*.cpp) \
-             $(wildcard ../clparser/*.cpp)
+             $(wildcard ../clparser/*.cpp) \
+			 $(wildcard ../be1/biir-codegen/*.cpp)
 
 OBJS      := $(SRCS:.cpp=.o)
 TARGET    := beryl

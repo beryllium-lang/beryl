@@ -17,6 +17,10 @@ macOS-homebrew-clang/.cache/clangd/index
 /testing
 <<<<<<< HEAD
 pxt/
+=======
+mineraloil/build_minoil.sh
+
+>>>>>>> 6f69a11487a723977d9eca597fe345c78f695535
 
 # pentagon
 /pentagon-tests/

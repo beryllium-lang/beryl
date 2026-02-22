@@ -8,7 +8,7 @@ For the compiler:
 
 - C++20
 - LLVM API
-- Make
+- Meson
 
 For the package manager:
 
@@ -26,35 +26,12 @@ cd BerylliumLang
 
 Compiler:
 
-There are only Makefiles for macOS homebrew clang, macOS Apple Clang, and Linux, but the code itself is cross-platform.
-Linux:
-
 ```sh
-cd linux
-make
+meson setup builddir
+meson compile -C builddir
 ```
 
-The executable will be located at ./beryl.
-
-macOS Apple Clang:
-
-```sh
-cd macOS-apple-clang
-make
-```
-
-The executable will be located at ./beryl.
-
-macOS Homebrew Clang:
-
-```sh
-cd macOS-homebrew-clang
-make
-```
-
-The executable will be located at ./beryl.
-
-For Windows, figure it out yourself.
+The executable is at ./builddir/beryl
 
 Package manager:
 

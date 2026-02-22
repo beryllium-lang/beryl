@@ -5,12 +5,12 @@
 #include "utils/arena.hpp"
 #include "utils/error.hpp"
 #include "utils/parse_json_params.hpp"
-#include "llvm/IR/IRBuilder.h"
-#include "llvm/IR/LLVMContext.h"
-#include "llvm/IR/Module.h"
 #include <filesystem>
 #include <fstream>
 #include <iostream>
+#include <llvm/IR/IRBuilder.h>
+#include <llvm/IR/LLVMContext.h>
+#include <llvm/IR/Module.h>
 #include <sstream>
 
 namespace fs = std::filesystem;
@@ -41,8 +41,7 @@ namespace beryl {
 
     for (size_t i = 2; i < args.argc; ++i) {
       std::string arg = args.argv[i];
-      if (fs::path(arg).extension() == ".by")
-        paths_to_by_file.emplace_back(arg);
+      if (fs::path(arg).extension() == ".by") paths_to_by_file.emplace_back(arg);
       else if (arg == "--no-link")
         link = false;
       else if (arg == "--force-module-recompile")
@@ -61,18 +60,15 @@ namespace beryl {
         exec = arg.substr(5);
       else if (arg.rfind("-std=", 0) == 0) {
         std::string verstr = arg.substr(5);
-        if (verstr == "be1")
-          ver = {.major = 1, .minor = 0};
+        if (verstr == "be1") ver = {.major = 1, .minor = 0};
         else
           beryl::throw_arg_read_error("Unknown version: " + verstr);
       } else
         beryl::throw_arg_read_warning("Unknown compiler argument: " + arg);
     }
 
-    if (paths_to_by_file.size() == 0)
-      beryl::throw_arg_read_error("There is no .by file to compile");
-    if (paths_to_by_file.size() > 1 && exec.has_value())
-      beryl::throw_arg_read_error("Cannot redirect output for multiple files");
+    if (paths_to_by_file.size() == 0) beryl::throw_arg_read_error("There is no .by file to compile");
+    if (paths_to_by_file.size() > 1 && exec.has_value()) beryl::throw_arg_read_error("Cannot redirect output for multiple files");
 
     llvm::LLVMContext context;
 

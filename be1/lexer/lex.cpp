@@ -101,7 +101,7 @@ namespace beryl::be1 {
   }
 
   static bool is_alpha(char c) {
-    return c >= 'A' && c <= 'Z' || c >= 'a' && c <= 'z';
+    return (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z');
   }
 
   static bool is_alnum(char c) {

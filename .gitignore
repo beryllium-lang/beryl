@@ -9,18 +9,13 @@
 !start/linux-arm.o
 !start/linux-x86_64.o
 *.a
-objfiles
-compile_commands.json
 *.pyc
 macOS-homebrew-clang/.cache/clangd/index
 /.venv
 /testing
-<<<<<<< HEAD
-pxt/
-=======
+/builddir
 mineraloil/build_minoil.sh
 
->>>>>>> 6f69a11487a723977d9eca597fe345c78f695535
 
 # pentagon
 /pentagon-tests/

@@ -17,30 +17,19 @@ namespace beryl {
     }
     if (directory_exists("__bervenv__"))
       beryl::throw_arg_read_error(
-        "__bervenv__ folder already exists. Please "
-        "delete the existing venv or use a different directory.");
-    try {
-      fs::create_directory("__bervenv__");
-      fs::create_directory("__bervenv__/syspacks");
-      fs::create_directory("__bervenv__/build");
-    } catch (const std::filesystem::filesystem_error& e) {
-      fs::remove_all("__bervenv__");
-      beryl::throw_arg_read_error("Failed to create venv: " + std::string(e.what()));
-      std::cerr << "Bervenv creation failed. Cleanup done.\n";
-    }
+          "__bervenv__ folder already exists. Please "
+          "delete the existing venv or use a different directory.");
+    fs::create_directory("__bervenv__");
+    fs::create_directory("__bervenv__/syspacks");
+    fs::create_directory("__bervenv__/build");
     if (install_stdlib) {
       std::cout << "Installing standard library...\n";
-      try {
-        std::system("mineraloil install stdlib");
-      } catch (const std::exception& e) {
-        beryl::throw_arg_read_error("Failed to install standard library: " + std::string(e.what()));
-      }
+      std::system("mineraloil install std");
     }
   }
 
   void destroy_venv(CompileArgs args) {
-    if (!directory_exists("__bervenv__"))
-      beryl::throw_arg_read_error("Bervenv does not exist to remove");
+    if (!directory_exists("__bervenv__")) beryl::throw_arg_read_error("Bervenv does not exist to remove");
     std::error_code ec;
     bool do_rem = false;
     if (args.argc > 2) {
@@ -49,8 +38,7 @@ namespace beryl {
       do_rem = ask();
     if (do_rem) {
       std::uintmax_t count = fs::remove_all("__bervenv__", ec);
-      if (count == static_cast<std::uintmax_t>(-1) || ec.value() != 0)
-        beryl::throw_arg_read_error("Failed to destroy venv: " + ec.message());
+      if (count == static_cast<std::uintmax_t>(-1) || ec.value() != 0) beryl::throw_arg_read_error("Failed to destroy venv: " + ec.message());
     }
   }
-}
+} // namespace beryl

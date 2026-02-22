@@ -1,6 +1,6 @@
 #include "parse_json_params.hpp"
-#include "third-party/json.hpp"
 #include "error.hpp"
+#include "third-party/json.hpp"
 #include <fstream>
 
 namespace beryl {
@@ -8,16 +8,11 @@ namespace beryl {
     using json = nlohmann::json;
     std::ifstream file((std::string(path)));
     if (!file.is_open()) throw_arg_read_error("Could not open manifest: " + std::string(path));
-    try {
-      json data = json::parse(file);
-      if (!data.contains("includes")) throw_arg_read_error("Configuration error: 'includes' key missing in " + std::string(path));
-      auto& includes_node = data["includes"];
-      if (!includes_node.is_array()) throw_arg_read_error("Type error: 'includes' must be an array in " + std::string(path));
-      return includes_node.get<std::vector<std::string>>();
-    } catch (const json::parse_error& e) {
-      throw_arg_read_error("JSON Syntax Error: " + std::string(e.what()));
-    }
-
+    json data = json::parse(file);
+    if (!data.contains("includes")) throw_arg_read_error("Configuration error: 'includes' key missing in " + std::string(path));
+    auto& includes_node = data["includes"];
+    if (!includes_node.is_array()) throw_arg_read_error("Type error: 'includes' must be an array in " + std::string(path));
+    return includes_node.get<std::vector<std::string>>();
     return {};
   }
 } // namespace beryl

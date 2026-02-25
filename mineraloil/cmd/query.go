@@ -12,12 +12,9 @@ import (
 	"path"
 	"slices"
 
+	"github.com/arvillacl16-bit/mineraloil/helpers"
 	"github.com/spf13/cobra"
 )
-
-const BERVENV = "./__bervenv__"
-
-var SYSPACKS = path.Join(BERVENV, "syspacks")
 
 type Dependency struct {
 	Name     string
@@ -44,7 +41,11 @@ var queryCmd = &cobra.Command{
 	Args:  cobra.MinimumNArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		for _, pack := range args {
-			jsonPath := path.Join(SYSPACKS, pack, "pkg.json")
+			bervenv, err := helpers.FindBervenv()
+			if err != nil {
+				return err
+			}
+			jsonPath := path.Join(bervenv, "syspacks", pack, "pkg.json")
 			buffer, err := os.ReadFile(jsonPath)
 			if err != nil {
 				return fmt.Errorf("Failed to read %s: %w", jsonPath, err)

@@ -6,7 +6,6 @@ import (
 	"path"
 
 	"github.com/arvillacl16-bit/mineraloil/helpers"
-
 	"github.com/spf13/cobra"
 )
 
@@ -35,8 +34,13 @@ var uninstallCmd = &cobra.Command{
 			doUninstall = helpers.Ask()
 		}
 
+		bervenv, err := helpers.FindBervenv()
+		if err != nil {
+			return err
+		}
+
 		for _, pack := range args {
-			packPath := path.Join("./__bervenv__", "syspacks", pack)
+			packPath := path.Join(bervenv, "syspacks", pack)
 			isDir, err := IsDir(packPath)
 			if err != nil {
 				return err

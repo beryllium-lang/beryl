@@ -5,18 +5,10 @@ import (
 	"os"
 	"path"
 
+	"github.com/arvillacl16-bit/mineraloil/helpers"
+
 	"github.com/spf13/cobra"
 )
-
-func Ask() bool {
-	fmt.Printf("Are you sure? ")
-	var c rune
-	fmt.Scan(&c)
-	if c == 'Y' || c == 'y' {
-		return true
-	}
-	return false
-}
 
 func IsDir(path string) (bool, error) {
 	fileInfo, err := os.Stat(path)
@@ -40,7 +32,7 @@ var uninstallCmd = &cobra.Command{
 
 		doUninstall := false || force
 		if !doUninstall {
-			doUninstall = Ask()
+			doUninstall = helpers.Ask()
 		}
 
 		for _, pack := range args {

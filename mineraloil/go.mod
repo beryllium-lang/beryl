@@ -1,4 +1,4 @@
-module github.com/arvillacl16-bit/BerylliumLang
+module github.com/arvillacl16-bit/mineraloil
 
 go 1.25.7
 

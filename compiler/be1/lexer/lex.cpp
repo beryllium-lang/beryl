@@ -74,24 +74,6 @@ namespace beryl::be1 {
       {"<<", Token::LEFT_SHIFT},    {"+=", Token::PLUS_EQ}, {"-=", Token::MINUS_EQ},  {"*=", Token::ASTER_EQ},
       {"/=", Token::FORW_SLASH_EQ}, {"%=", Token::MOD_EQ},  {"++", Token::PLUS_PLUS}, {"--", Token::MINUS_MINUS}};
 
-  const Token& TokenStream::advance() {
-    if (!has_next()) beryl::throw_lex_error("End of token stream reached", -1, -1);
-    return tokens[cursor++];
-  }
-
-  const Token& TokenStream::peek(size_t offset) const {
-    if (cursor + offset >= tokens.size()) return tokens.back();
-    return tokens[cursor + offset];
-  }
-
-  bool TokenStream::match(TokenType type) {
-    if (has_next() && peek().type == type) {
-      advance();
-      return true;
-    }
-    return false;
-  }
-
   static bool is_space(char c) {
     return c == ' ' || c == '\n' || c == '\r' || c == '\f' || c == '\t' || c == '\v';
   }

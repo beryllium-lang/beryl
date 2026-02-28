@@ -239,9 +239,21 @@ namespace beryl::be1 {
     TokenStream(const std::vector<Token>& tokens_) : tokens(tokens_), cursor(0) {}
 
     bool has_next() const { return cursor < tokens.size(); }
-    const Token& peek(size_t offset = 0) const;
-    const Token& advance();
-    bool match(TokenType type);
+    const Token& peek(size_t offset = 0) const {
+      if (size_t idx = cursor + offset; idx >= tokens.size()) return tokens.back();
+      else return tokens[idx];
+    }
+
+    void advance() {
+      if (cursor < tokens.size()) ++cursor;
+    }
+
+    bool match(TokenType type) {
+      if (tokens[cursor] == type) {
+        ++cursor;
+        return true;
+      } else return false;
+    }
 
     class Iterator {
     private:

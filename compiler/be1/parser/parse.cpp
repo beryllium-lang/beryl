@@ -45,10 +45,10 @@ namespace beryl::be1 {
     ast::ImportDecl* construct_import(TokenStream& tokens, ArenaWrapper& arena) {
       auto import = arena.alloc<ast::ImportDecl>();
       auto next_token = tokens.peek(1);
-      tokens.advance();
       if (next_token != Token::IDENT || next_token != Token::DOT) {
-        throw_lex_error("Package name must be identifier.", next_token.line, next_token.col);
-      } 
+        throw_lex_error("A module name must come after an import statement", next_token.line, next_token.col);
+      }
+      tokens.advance();
       return import;
     }
 
@@ -74,10 +74,8 @@ namespace beryl::be1 {
         tree->body.emplace_back(construct_nsp(tokens, arena));
       else if (tokens.peek() == Token::VAR || (tokens.peek() == Token::PUBLISH && tokens.peek(1) == Token::VAR))
         tree->body.emplace_back(construct_var(tokens, arena));
-      else if (tokens.peek() == Token::IMPORT || (tokens.peek() == Token::PUBLISH && tokens.peek(1) == Token::IMPORT)) {
-        throw_arg_read_warning("Used import");
+      else if (tokens.peek() == Token::IMPORT || (tokens.peek() == Token::PUBLISH && tokens.peek(1) == Token::IMPORT)) 
         tree->body.emplace_back(construct_import(tokens, arena));
-      }
       else if (tokens.peek() == Token::ENUM)
         tree->body.emplace_back(construct_enum(tokens, arena));
       else if (tokens.peek() == Token::TRAIT)

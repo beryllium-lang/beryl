@@ -45,7 +45,7 @@ namespace beryl::be1 {
     ast::ImportDecl* construct_import(TokenStream& tokens, ArenaWrapper& arena) {
       auto import = arena.alloc<ast::ImportDecl>();
       auto next_token = tokens.peek(1);
-      if (next_token != Token::IDENT || next_token != Token::DOT) {
+      if (next_token != Token::IDENT && next_token != Token::DOT) {
         throw_lex_error("A module name must come after an import statement", next_token.line, next_token.col);
       }
       tokens.advance();

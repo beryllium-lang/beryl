@@ -56,9 +56,11 @@ namespace beryl {
         opt_level = OptLevel::THREE;
       else if (arg.rfind("-includes=", 0) == 0)
         includes = beryl::get_includes(arg.substr(10));
-      else if (arg.rfind("-out=", 0) == 0)
-        exec = arg.substr(5);
-      else if (arg.rfind("-std=", 0) == 0) {
+      else if (arg == "-o") {
+        if (i == args.argc - 1) throw_arg_read_error("-o needs a file name to specify output");
+        ++i;
+        exec = args.argv[i];
+      } else if (arg.rfind("-std=", 0) == 0) {
         std::string verstr = arg.substr(5);
         if (verstr == "be1") ver = {.major = 1, .minor = 0};
         else

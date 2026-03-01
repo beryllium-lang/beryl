@@ -118,7 +118,7 @@ namespace beryl::be1 {
     int col;
 
     bool operator==(const Token& other) const { return type == other.type; }
-    bool operator!=(const Token& other) const { return !(*this == other); }
+    bool operator!=(const Token& other) const { return type != other.type; }
     bool operator==(decltype(Token::VAR) t) const { return type == t; }
     bool operator!=(decltype(Token::VAR) t) const { return type != t; }
 

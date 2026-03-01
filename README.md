@@ -15,13 +15,17 @@ For the package manager:
 - Go
 - Cobra
 
+For the Beryllium runtime:
+
+- C compiler
+
 ## Building
 
 First, clone the repository:
 
 ```sh
-git clone www.github.com/arvillacl16-bit/BerylliumLang.git
-cd BerylliumLang
+git clone www.github.com/arvillacl16-bit/beryllium-lang.git
+cd beryllium-lang
 ```
 
 Compiler:
@@ -40,5 +44,9 @@ Package manager:
 cd mineraloil
 go build -o mineraloil main.go
 ```
+
+Runtime:
+
+The C file is at ./start/start.c. It is a single file that can be compiled directly with no issues.
 
 The executable is at ./mineraloil.

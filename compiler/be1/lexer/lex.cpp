@@ -247,8 +247,7 @@ namespace beryl::be1 {
         tok.metadata = s;
 
         if (auto it = KEYWORDS.find(s); it != KEYWORDS.cend()) tok.type = it->second;
-        else
-          tok.type = Token::IDENT;
+        else tok.type = Token::IDENT;
 
         tokens.push_back(tok);
         continue;

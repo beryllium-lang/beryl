@@ -3,68 +3,61 @@
 
 namespace beryl::be1 {
   namespace {
-    struct ArenaWrapper {
-      Arena& arena;
+    ast::VarDecl* construct_var(TokenStream&, Arena&);
 
-      template <typename T> T* alloc() {
-        T* res = arena.alloc<T>();
-        if (!res) throw_arg_read_error("Ran out of space in arena");
-        return res;
-      }
-    };
-
-    ast::VarDecl* construct_var(TokenStream&, ArenaWrapper&);
-
-    ast::ClassDecl* construct_class(TokenStream& tokens, ArenaWrapper& arena) {
+    ast::ClassDecl* construct_class(TokenStream& tokens, Arena& arena) {
       auto class_ = arena.alloc<ast::ClassDecl>();
       tokens.advance();
-      if (auto tok = tokens.peek(1); tok != Token::IDENT) beryl::throw_lex_error("Class does not have identifier", tok.line, tok.col);
+      if (auto tok = tokens.peek(1); tok != Token::IDENT) beryl::throw_lex_error("class does not have identifier", tok.line, tok.col);
       else
         class_->name = tok.metadata;
       tokens.advance();
-      if (auto tok = tokens.peek(1); tok != Token::OPEN_CURLY) beryl::throw_lex_error("Class not opened with brace", tok.line, tok.col);
+      if (auto tok = tokens.peek(1); tok != Token::OPEN_CURLY) beryl::throw_lex_error("class not opened with brace", tok.line, tok.col);
       tokens.advance();
       return class_;
     }
 
-    ast::FunctionDecl* construct_func(TokenStream& tokens, ArenaWrapper& arena) {
+    ast::FunctionDecl* construct_func(TokenStream& tokens, Arena& arena) {
       auto func = arena.alloc<ast::FunctionDecl>();
       return func;
     }
 
-    ast::NamespaceDecl* construct_nsp(TokenStream& tokens, ArenaWrapper& arena) {
+    ast::NamespaceDecl* construct_nsp(TokenStream& tokens, Arena& arena) {
       auto nsp = arena.alloc<ast::NamespaceDecl>();
       return nsp;
     }
 
-    ast::VarDecl* construct_var(TokenStream& tokens, ArenaWrapper& arena) {
+    ast::VarDecl* construct_var(TokenStream& tokens, Arena& arena) {
       auto var = arena.alloc<ast::VarDecl>();
       return var;
     }
 
-    ast::ImportDecl* construct_import(TokenStream& tokens, ArenaWrapper& arena) {
+    ast::ImportDecl* construct_import(TokenStream& tokens, Arena& arena) {
       auto import = arena.alloc<ast::ImportDecl>();
+      if (tokens.peek() == Token::PUBLISH) {
+        import->publish = true;
+        tokens.advance();
+      } else import->publish = false;
       auto next_token = tokens.peek(1);
       if (next_token != Token::IDENT && next_token != Token::DOT) {
-        throw_lex_error("A module name must come after an import statement", next_token.line, next_token.col);
+        throw_lex_error("a module name must come after an import statement", next_token.line, next_token.col);
       }
       tokens.advance();
       return import;
     }
 
-    ast::EnumDecl* construct_enum(TokenStream& tokens, ArenaWrapper& arena) {
+    ast::EnumDecl* construct_enum(TokenStream& tokens, Arena& arena) {
       auto enum_ = arena.alloc<ast::EnumDecl>();
       return enum_;
     }
 
-    ast::TraitDecl* construct_trait(TokenStream& tokens, ArenaWrapper& arena) {
+    ast::TraitDecl* construct_trait(TokenStream& tokens, Arena& arena) {
       auto trait = arena.alloc<ast::TraitDecl>();
       return trait;
     }
   } // namespace
 
-  ast::Program* parse(TokenStream& tokens, Arena& raw_arena) {
-    ArenaWrapper arena{.arena = raw_arena};
+  ast::Program* parse(TokenStream& tokens, Arena& arena) {
     ast::Program* tree = arena.alloc<ast::Program>();
     while (tokens.has_next() && tokens.peek().type != Token::EOF_TOKEN) {
       if (tokens.peek() == Token::CLASS) tree->body.emplace_back(construct_class(tokens, arena));
@@ -81,7 +74,7 @@ namespace beryl::be1 {
       else if (tokens.peek() == Token::TRAIT)
         tree->body.emplace_back(construct_trait(tokens, arena));
       else
-        beryl::throw_lex_error("Unknown global-level declaration", tokens.peek().line, tokens.peek().col);
+        beryl::throw_lex_error("unknown global-level declaration", tokens.peek().line, tokens.peek().col);
       continue;
     }
     return tree;

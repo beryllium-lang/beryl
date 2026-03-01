@@ -18,8 +18,17 @@ namespace beryl::be1 {
       std::optional<long> size_const;
     };
 
+    struct FuncType {
+      std::string mangled_name;
+    };
+
+    struct FuncPtrType {
+      TypeNode* return_type;
+      std::vector<TypeNode*> param_types;
+    };
+
     struct TypeNode {
-      std::variant<std::string, GenericType*> specifier;
+      std::variant<std::string, GenericType*, FuncType*, FuncPtrType*> specifier;
 
       bool is_mut = false;
       bool is_ref = false;
@@ -222,6 +231,7 @@ namespace beryl::be1 {
     struct ImportDecl {
       std::string module_name;
       std::vector<std::string> entities;
+      bool publish = false;
     };
 
     struct Program {
@@ -230,5 +240,4 @@ namespace beryl::be1 {
   } // namespace ast
 
   ast::Program* parse(TokenStream& tokens, Arena& arena);
-  void write_ast_to_gv_file(const ast::Program* const prog, std::string_view path);
 } // namespace beryl::be1

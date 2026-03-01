@@ -4,6 +4,7 @@
 #include <cstdlib>
 #include <limits>
 #include <utility>
+#include "utils/error.hpp"
 
 namespace beryl {
   class Arena {
@@ -55,7 +56,7 @@ namespace beryl {
 
     void* allocate_bytes(size_t bytes, size_t alignment) noexcept {
       size_t aligned = align_up(offset, alignment);
-      if (aligned > size || bytes > size - aligned) return nullptr;
+      if (aligned > size || bytes > size - aligned) throw_arg_read_error("ran out of arena space");
 
       void* ptr = start + aligned;
       offset = aligned + bytes;

@@ -60,7 +60,6 @@ source_files = [
   'be1/biir-codegen/gen.cpp',
   'be1/lexer/lex.cpp',
   'be1/parser/parse.cpp',
-  'be1/parser/write_to_gv.cpp',
   'utils/error.cpp',
   'utils/parse_json_params.cpp'
 ]

@@ -8,6 +8,7 @@ dep_zstd = dependency('libzstd')
 dep_zlib = dependency('zlib')
 dep_xml2 = dependency('libxml-2.0')
 dep_gtest = dependency('gtest', fallback : ['gtest', 'dep_gtest'])
+dep_gtest_main = dependency('gtest_main')
 
 # 2. LLVM
 llvm_dep = dependency('llvm', 
@@ -66,7 +67,7 @@ test_files = ['../tests/unit-tests/structopt1.cpp']
 
 struct_opt_1 = executable('struct_opt_1', 
   test_files + source_files, 
-  dependencies : [dep_zstd, dep_zlib, dep_xml2, llvm_dep, dep_gtest],
+  dependencies : [dep_zstd, dep_zlib, dep_xml2, llvm_dep, dep_gtest, dep_gtest_main],
   cpp_args : relevant_cxxflags,
   link_args : extra_link_args,
   build_rpath : build_rpath_dirs.length() > 0 ? ':'.join(build_rpath_dirs) : '',

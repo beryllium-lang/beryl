@@ -33,7 +33,6 @@ namespace beryl::be1 {
 
     ast::ImportDecl* construct_import(TokenStream& tokens, Arena& arena) {
       auto import = arena.alloc<ast::ImportDecl>();
-      import->module_name = "";
       if (tokens.peek() == Token::PUBLISH) {
         import->publish = true;
         tokens.advance();

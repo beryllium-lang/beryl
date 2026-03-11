@@ -37,7 +37,7 @@ namespace beryl::be1 {
         import->publish = true;
         tokens.advance();
       } else import->publish = false;
-      auto next_token = tokens.peek(1);
+      auto next_token = tokens.peek();
       if (next_token != Token::IDENT && next_token != Token::DOT) {
         throw_lex_error("a module name must come after an import statement", next_token.line, next_token.col);
       }
@@ -49,15 +49,24 @@ namespace beryl::be1 {
       }
       while (true) {
         const auto& curr_tok = tokens.peek();
-        if (const auto& tok = tokens.peek(1); tok != Token::SEMI && tok != Token::FROM)
-          throw_lex_error("invalid import statement", tok.line, tok.col);
-        if ((curr_tok == Token::DOT && prev_is_dot) || (curr_tok == Token::IDENT && !prev_is_dot))
+        if (prev_is_dot && curr_tok == Token::DOT) {
           throw_lex_error("invalid module name", curr_tok.line, curr_tok.col);
-        if (curr_tok == Token::DOT) {
+        } else if (curr_tok == Token::IDENT) {
+          import->module_name += curr_tok.metadata;
+          prev_is_dot = false;
+        } else if (curr_tok == Token::DOT) {
+          import->module_name += '.';
+          prev_is_dot = true;
+        } else if (curr_tok == Token::FROM) {
+          if (prev_is_dot) throw_lex_error("invalid module name", curr_tok.line, curr_tok.col);
+          throw_lex_error("did not implement from logic yet", curr_tok.line, curr_tok.col);
+          tokens.advance();
+        } else if (curr_tok == Token::SEMI) {
+          if (prev_is_dot) throw_lex_error("invalid module name", curr_tok.line, curr_tok.col);
+          tokens.advance();
+          break;
         }
-        if (curr_tok == Token::IDENT) import->module_name += curr_tok.metadata;
       }
-      tokens.advance();
       return import;
     }
 

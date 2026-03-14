@@ -72,6 +72,13 @@ namespace beryl::be1 {
 
     ast::EnumDecl* construct_enum(TokenStream& tokens, Arena& arena) {
       auto enum_ = arena.alloc<ast::EnumDecl>();
+      if (tokens.match(Token::UNSAFE)) enum_->is_unsafe = true;
+
+      if (!tokens.match(Token::IDENT)) {
+        throw_lex_error("an enum must have a name", tokens.peek().line, tokens.peek().col);
+      } else {
+        enum_->enum_name = tokens.peek().metadata;
+      }
       return enum_;
     }
 

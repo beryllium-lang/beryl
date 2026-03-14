@@ -221,6 +221,7 @@ namespace beryl::be1 {
     struct EnumDecl {
       std::string enum_name;
       std::vector<std::string> entities;
+      bool is_unsafe = false;
     };
 
     struct NamespaceDecl {

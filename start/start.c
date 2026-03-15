@@ -30,9 +30,5 @@ int main(int argc, char** argv) {
 
   start(args);
 
-  for (unsigned long i = 0; i < args.size; i++) {
-    free(args.elements[i].data);
-  }
-  free(args.elements);
   return 0;
 }

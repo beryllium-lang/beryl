@@ -4,16 +4,9 @@ This is a hobby programming language. It is WIP.
 
 ## Dependencies
 
-For the compiler:
-
 - C++20
 - LLVM API
 - Meson
-
-For the package manager:
-
-- Go
-- Cobra
 
 For the Beryllium runtime:
 
@@ -28,7 +21,7 @@ git clone www.github.com/arvillacl16-bit/beryllium-lang.git
 cd beryllium-lang
 ```
 
-Compiler:
+To build:
 
 ```sh
 cd compiler
@@ -36,20 +29,11 @@ meson setup builddir --buildtype=release
 meson compile -C builddir
 ```
 
-The executable is at ./builddir/beryl. It does support install, so if you want to install, do:
+If you want to install system-wide:
 
 ```sh
 meson install -C builddir
 ```
-
-Package manager:
-
-```sh
-cd mineraloil
-go build -o mineraloil main.go
-```
-
-The executable is at ./mineraloil.
 
 Runtime:
 

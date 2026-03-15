@@ -65,7 +65,7 @@ source_files = [
 beryl_core = static_library('beryl-core', source_files, dependencies : [dep_zstd, dep_zlib, dep_xml2, llvm_dep])
 
 if dep_gtest_main.found()
-  test_files = {'structopt1': '../tests/unit-tests/structopt1.cpp', 'import1': '../tests/unit-tests/import-test1.cpp'}
+  test_files = {'structopt1': 'unit-tests/structopt1.cpp', 'import1': 'unit-tests/import-test1.cpp'}
 
   foreach test_name, test_file : test_files
     test_exe = executable(test_name, 

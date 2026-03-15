@@ -7,8 +7,7 @@ project('Beryl', ['cpp', 'c'],
 dep_zstd = dependency('libzstd')
 dep_zlib = dependency('zlib')
 dep_xml2 = dependency('libxml-2.0')
-dep_gtest = dependency('gtest', fallback : ['gtest', 'gtest_dep'])
-dep_gtest_main = dependency('gtest_main', fallback : ['gtest', 'gtest_main_dep'])
+dep_gtest_main = dependency('gtest_main', required : false)
 
 # 2. LLVM
 llvm_dep = dependency('llvm', 
@@ -65,20 +64,22 @@ source_files = [
 
 beryl_core = static_library('beryl-core', source_files, dependencies : [dep_zstd, dep_zlib, dep_xml2, llvm_dep])
 
-test_files = {'structopt1': '../tests/unit-tests/structopt1.cpp'}
+if dep_gtest_main.found()
+  test_files = {'structopt1': '../tests/unit-tests/structopt1.cpp'}
 
-foreach test_name, test_file : test_files
-  test_exe = executable(test_name, 
-    sources : test_file, 
-    dependencies : [dep_gtest, dep_gtest_main], 
-    link_with : beryl_core,
-    link_args : extra_link_args,
-    cpp_args : relevant_cxxflags,
-    build_rpath : build_rpath_dirs.length() > 0 ? ':'.join(build_rpath_dirs) : ''
-  )
+  foreach test_name, test_file : test_files
+    test_exe = executable(test_name, 
+      sources : test_file, 
+      dependencies : [dep_gtest_main], 
+      link_with : beryl_core,
+      link_args : extra_link_args,
+      cpp_args : relevant_cxxflags,
+      build_rpath : build_rpath_dirs.length() > 0 ? ':'.join(build_rpath_dirs) : ''
+    )
 
-  test(test_name, test_exe)
-endforeach
+    test(test_name, test_exe)
+  endforeach
+endif
 
 executable('beryl', 
   sources : 'beryl.cpp',

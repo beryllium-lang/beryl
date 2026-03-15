@@ -23,6 +23,13 @@ namespace beryl::be1 {
 
     ast::NamespaceDecl* construct_nsp(TokenStream& tokens, Arena& arena) {
       auto nsp = arena.alloc<ast::NamespaceDecl>();
+      tokens.advance();
+      if (!tokens.match(Token::IDENT)) {
+        throw_lex_error("a namespace must have a name", tokens.peek(1).line, tokens.peek(1).col);
+      } else nsp->name = tokens.peek().metadata;
+      while (tokens.peek() != Token::CLOSE_BRACKET) {
+        // TODO: Implement
+      }
       return nsp;
     }
 
@@ -65,7 +72,7 @@ namespace beryl::be1 {
           if (prev_is_dot) throw_lex_error("invalid module name", curr_tok.line, curr_tok.col);
           tokens.advance();
           break;
-        }
+        } else throw_lex_error("unexpected token: " + curr_tok.to_string(), curr_tok.line, curr_tok.col);
       }
       return import;
     }
@@ -75,7 +82,7 @@ namespace beryl::be1 {
       if (tokens.match(Token::UNSAFE)) enum_->is_unsafe = true;
 
       if (!tokens.match(Token::IDENT)) {
-        throw_lex_error("an enum must have a name", tokens.peek().line, tokens.peek().col);
+        throw_lex_error("an enum must have a name", tokens.peek(1).line, tokens.peek(1).col);
       } else {
         enum_->enum_name = tokens.peek().metadata;
       }

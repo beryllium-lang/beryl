@@ -44,6 +44,7 @@ namespace beryl::be1 {
         import->publish = true;
         tokens.advance();
       } else import->publish = false;
+      tokens.advance();
       auto next_token = tokens.peek();
       if (next_token != Token::IDENT && next_token != Token::DOT) {
         throw_lex_error("a module name must come after an import statement", next_token.line, next_token.col);
@@ -59,8 +60,9 @@ namespace beryl::be1 {
         if (prev_is_dot && curr_tok == Token::DOT) {
           throw_lex_error("invalid module name", curr_tok.line, curr_tok.col);
         } else if (curr_tok == Token::IDENT) {
+          if (!prev_is_dot) throw_lex_error("invalid module name", curr_tok.line, curr_tok.col);
           import->module_name += curr_tok.metadata;
-          prev_is_dot = false;
+        prev_is_dot = false;
         } else if (curr_tok == Token::DOT) {
           import->module_name += '.';
           prev_is_dot = true;

@@ -1,6 +1,6 @@
 .clangd
 /.vscode
-compiler/.cache
+/.cache
 
 *.pyc
 /.venv

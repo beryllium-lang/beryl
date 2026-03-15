@@ -64,6 +64,7 @@ namespace beryl::be1 {
           import->module_name += curr_tok.metadata;
           prev_is_dot = false;
         } else if (curr_tok == Token::DOT) {
+          log("ran here");
           import->module_name += '.';
           prev_is_dot = true;
         } else if (curr_tok == Token::FROM) {

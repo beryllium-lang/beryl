@@ -13,3 +13,5 @@ compiler/setup.sh
 
 # pentagon
 pentagon-tests/
+compile_beryl.sh
+setup.sh

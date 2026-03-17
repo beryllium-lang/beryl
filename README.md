@@ -24,7 +24,6 @@ cd beryllium-lang
 To build:
 
 ```sh
-cd compiler
 meson setup builddir --buildtype=release
 meson compile -C builddir
 ```

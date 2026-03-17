@@ -11,6 +11,9 @@ mineraloil/build_minoil.sh
 compiler/compile_beryl.sh
 compiler/setup.sh
 
+../communications.txt
+../replit
+
 # pentagon
 pentagon-tests/
 compile_beryl.sh

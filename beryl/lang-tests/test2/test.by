@@ -1,0 +1,6 @@
+import std.io;
+
+func start(args: dynarr<string>) {
+  std.out.println("Hello, world!");
+  exit 0;
+}

@@ -1,0 +1,29 @@
+[agent]
+expertMode = true
+
+[nix]
+packages = ["meson", "libzstd-dev", "pkg-config", "cmake", "gcc", "binutils", "zstd", "zlib", "libxml2", "llvm_14", "ninja"]
+channel = "stable-25_05"
+
+[workflows]
+runButton = "Project"
+
+[[workflows.workflow]]
+name = "Project"
+mode = "parallel"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "Build BerylliumLang"
+
+[[workflows.workflow]]
+name = "Build BerylliumLang"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "cd beryl && meson setup builddir --reconfigure && ninja -C builddir"
+
+[workflows.workflow.metadata]
+outputType = "console"

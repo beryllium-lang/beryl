@@ -1,0 +1,26 @@
+import std.io;
+
+/*
+
+dskjb
+ekjfajkfb
+wskijabhfgwquisegh
+
+
+*/
+
+func start(args: dynarr<string>) {
+  std.io.println("Hello world!");
+
+  var pointer: unsafeptr<int> = nullptr;
+  var b = true;
+  var b_exp_type: bool = false;
+
+  var char_test = 'd';
+
+  var res = 3 - 2;
+
+  var nest_gen_check: dynarr<unsafeptr<dynarr<int>>>;
+  exit 0;
+}
+/*

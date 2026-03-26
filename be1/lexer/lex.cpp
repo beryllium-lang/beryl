@@ -20,34 +20,7 @@ namespace beryl::be1 {
       {"bxnot", Token::BXNOT},
       {"as", Token::AS},
       {"unsafe", Token::UNSAFE},
-      {"bool", Token::BOOL},
-      {"char", Token::CHAR},
-      {"byte", Token::BYTE},
-      {"int", Token::INT},
-      {"long", Token::LONG},
-      {"qint", Token::QINT},
-      {"ubyte", Token::UBYTE},
-      {"uint", Token::UINT},
-      {"ulong", Token::ULONG},
-      {"uqint", Token::UQINT},
-      {"float", Token::FLOAT},
-      {"double", Token::DOUBLE},
       {"namespace", Token::NMSP},
-      {"string", Token::STRING},
-      {"bytestream", Token::BYTESTREAM},
-      {"arr", Token::ARR},
-      {"dynarr", Token::DYNARR},
-      {"adr", Token::ADR},
-      {"ptr", Token::PTR},
-      {"rcptr", Token::RCPTR},
-      {"weakptr", Token::WEAKPTR},
-      {"unsafeptr", Token::UNSAFEPTR},
-      {"ref", Token::REF},
-      {"res", Token::RES},
-      {"tup", Token::TUP},
-      {"opt", Token::OPT},
-      {"variant", Token::VARIANT},
-      {"unic", Token::UNIC},
       {"typeof", Token::TYPEOF},
       {"valat", Token::VALAT},
       {"ptrto", Token::PTRTO},
@@ -90,7 +63,7 @@ namespace beryl::be1 {
     return is_alpha(c) || is_digit(c);
   }
 
-  TokenStream lex(std::string_view buf, std::string_view path) {
+  TokenStream lex(std::string_view buf, std::string_view path) { 
     std::vector<Token> tokens;
     size_t cursor = 0;
     int line = 1;

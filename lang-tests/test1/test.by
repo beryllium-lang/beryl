@@ -1,5 +1,8 @@
 import std.io;
 
+var a: mut = 1;
+
+
 func start(args: dynarr<string>) {
   std.io.println("Hello world!");
 

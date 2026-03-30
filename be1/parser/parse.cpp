@@ -36,7 +36,7 @@ namespace beryl::be1 {
 
     ast::VarDecl* construct_var(TokenStream& tokens, Arena& arena) {
       auto var = arena.alloc<ast::VarDecl>();
-
+      log("beginning variable constructor");
       // variable thingy
       if (tokens.peek() == Token::PUBLISH) {
         //var->publish = true;
@@ -48,33 +48,46 @@ namespace beryl::be1 {
       // variable name
       if (tokens.peek() != Token::IDENT) {
         throw_lex_error("a variable must have a name", tokens.peek().line, tokens.peek().col);
-        
       } else {
         var->name = tokens.peek().metadata;
         tokens.advance();
-        
       }
 
-      // now the colon and equals to difference
       if (tokens.peek() == Token::COLON) {
+        tokens.advance();
+        
+        if (tokens.peek() == Token::MUT) {
+          throw_lex_error("mutable identifiers arent done yet", tokens.peek().line, tokens.peek().col);
+        } else if (tokens.peek() == Token::IDENT) {
+          throw_lex_error("variable type identifiers arent done yet", tokens.peek().line, tokens.peek().col);
+        } else {
+          throw_lex_error("variable must have an identifier", tokens.peek().line, tokens.peek().col);
+        }
+
+      } else if (tokens.peek() == Token::ASSIGN) {
+        throw_lex_error("equals to sign logic is harder, skip for now", tokens.peek().line, tokens.peek().col);
+      } else {
+        throw_lex_error("a variable must be defined", tokens.peek().line, tokens.peek().col);
+      }
+      // now the colon and equals to difference
+      /*if (tokens.peek() == Token::COLON) {
         tokens.advance();
         log("colon detected");
         if (tokens.peek() == Token::IDENT) {
           log("btw the metadata is this, do some stuff with it" + tokens.peek().metadata);
           throw_lex_error("did not implement type logic yet, but easier, so implement ",tokens.peek().line,tokens.peek().col);
       } else if (tokens.peek() == Token::ASSIGN) {
-        // this logic is harder, have to identify varialbe type
         throw_lex_error("did not implement variable definition logic yet", tokens.peek().line, tokens.peek().col);
       } else {
         throw_lex_error("variable must be defined", tokens.peek().line, tokens.peek().col);
       }
+    }*/
       
       return var;
     }
-    }
     ast::ImportDecl* construct_import(TokenStream& tokens, Arena& arena) {
       auto import = arena.alloc<ast::ImportDecl>();
-      
+      log("beginning import constructer");
       /* if (tokens.peek() == Token::PUBLISH) {
         import->publish = true;
         tokens.advance();
@@ -156,7 +169,7 @@ namespace beryl::be1 {
               break;
             }
           } else {
-            throw_lex_error("unexpected keyword at", tokens.peek().line, tokens.peek().col);
+            throw_lex_error("unexpected keyword", tokens.peek().line, tokens.peek().col);
           }
         }
       }

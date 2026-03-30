@@ -170,7 +170,24 @@ namespace beryl::be1 {
           import->module_name = tokens.peek().metadata;
           tokens.advance();
           if (tokens.peek() == Token::DOT) {
-            throw_lex_error("bro im too lazy to do this, just stop doing stuff wiht beryllium", tokens.peek().line, tokens.peek().col);
+            while (tokens.peek() != Token::SEMI) {
+              if (tokens.peek() == Token::DOT) {
+                import->module_name += ".";
+                tokens.advance();
+                if (tokens.peek() == Token::SEMI) {
+                  throw_lex_error("module name cannot end on a dot", tokens.peek().line, tokens.peek().col);
+                }
+              } else if (tokens.peek() == Token::IDENT) {
+                import->module_name += tokens.peek().metadata;
+                tokens.advance();
+                if (tokens.peek() == Token::SEMI) {
+                  log("yup i found the import statements");
+                  break;
+                }
+              } else {
+                throw_lex_error("unexpected keyword", tokens.peek().line, tokens.peek().col);
+              }
+            }
           }
         } else {
           throw_lex_error("a module name must come after an import statement", tokens.peek().line, tokens.peek().col);

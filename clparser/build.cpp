@@ -17,7 +17,7 @@ namespace fs = std::filesystem;
 
 namespace beryl {
   void build(BuildArgs args) {
-    beryl::Arena alloc(128 * 1024 * 2048);
+    beryl::Arena alloc(128 * 1024 * 2048); //increased memory
 
     llvm::LLVMContext context;
 

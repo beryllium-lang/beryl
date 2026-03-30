@@ -18,8 +18,37 @@ namespace beryl::be1 {
 
     ast::FunctionDecl* construct_func(TokenStream& tokens, Arena& arena) {
       auto func = arena.alloc<ast::FunctionDecl>();
-      log("starting the construction on funcitons");
-      return func;
+      if (tokens.peek() == Token::PUBLISH) {
+        //func->publish = true;
+        tokens.advance();
+      }
+      tokens.advance();
+
+      if (tokens.peek() != Token::IDENT) {
+        throw_lex_error("a function must have a name", tokens.peek().line, tokens.peek().col);
+      } else {
+        func->name = tokens.peek().metadata;
+      }
+      tokens.advance();
+
+      if (tokens.peek() != Token::OPEN_PAREN) {
+        throw_lex_error("a function must have parameters", tokens.peek().line, tokens.peek().col);
+      }
+      tokens.advance();
+      while (tokens.peek() != Token::CLOSE_PAREN) {
+        // too lazy to implement
+        tokens.advance();
+      }
+      tokens.advance();
+      if (tokens.peek() != Token::OPEN_CURLY) {
+        throw_lex_error("a function must have a body", tokens.peek().line, tokens.peek().col);
+      }
+      tokens.advance();
+      while (tokens.peek() != Token::CLOSE_CURLY) {
+        // brr
+      }
+      tokens.advance();
+
     }
 
     ast::NamespaceDecl* construct_nsp(TokenStream& tokens, Arena& arena) {

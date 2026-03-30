@@ -18,6 +18,7 @@ namespace beryl::be1 {
 
     ast::FunctionDecl* construct_func(TokenStream& tokens, Arena& arena) {
       auto func = arena.alloc<ast::FunctionDecl>();
+      log("starting the construction on funcitons");
       return func;
     }
 
@@ -35,12 +36,46 @@ namespace beryl::be1 {
 
     ast::VarDecl* construct_var(TokenStream& tokens, Arena& arena) {
       auto var = arena.alloc<ast::VarDecl>();
+
+      // variable thingy
+      if (tokens.peek() == Token::PUBLISH) {
+        //var->publish = true;
+        tokens.advance();
+        log("variable published whatever that means");
+      }
+      tokens.advance();
+
+      // variable name
+      if (tokens.peek() != Token::IDENT) {
+        throw_lex_error("a variable must have a name", tokens.peek().line, tokens.peek().col);
+        
+      } else {
+        var->name = tokens.peek().metadata;
+        tokens.advance();
+        
+      }
+
+      // now the colon and equals to difference
+      if (tokens.peek() == Token::COLON) {
+        tokens.advance();
+        log("colon detected");
+        if (tokens.peek() == Token::IDENT) {
+          log("btw the metadata is this, do some stuff with it" + tokens.peek().metadata);
+          throw_lex_error("did not implement type logic yet, but easier, so implement ",tokens.peek().line,tokens.peek().col);
+      } else if (tokens.peek() == Token::ASSIGN) {
+        // this logic is harder, have to identify varialbe type
+        throw_lex_error("did not implement variable definition logic yet", tokens.peek().line, tokens.peek().col);
+      } else {
+        throw_lex_error("variable must be defined", tokens.peek().line, tokens.peek().col);
+      }
+      
       return var;
     }
-
+    }
     ast::ImportDecl* construct_import(TokenStream& tokens, Arena& arena) {
       auto import = arena.alloc<ast::ImportDecl>();
-      if (tokens.peek() == Token::PUBLISH) {
+      
+      /* if (tokens.peek() == Token::PUBLISH) {
         import->publish = true;
         tokens.advance();
       } else import->publish = false;
@@ -64,7 +99,6 @@ namespace beryl::be1 {
           import->module_name += curr_tok.metadata;
           prev_is_dot = false;
         } else if (curr_tok == Token::DOT) {
-          log("ran here");
           import->module_name += '.';
           prev_is_dot = true;
         } else if (curr_tok == Token::FROM) {
@@ -76,7 +110,58 @@ namespace beryl::be1 {
           tokens.advance();
           break;
         } else throw_lex_error("unexpected token: " + curr_tok.to_string(), curr_tok.line, curr_tok.col);
+      } */
+      
+      if (tokens.peek() == Token::PUBLISH) {
+        import->publish = true;
+        tokens.advance();
+      } else import->publish = false;
+      tokens.advance();
+
+      if (tokens.peek() != Token::IDENT && tokens.peek() != Token::DOT) {
+        throw_lex_error("a module name must come after an import statement", tokens.peek().line, tokens.peek().col);
       }
+
+      if (tokens.peek() == Token::DOT) {
+        tokens.advance();
+        if (tokens.peek() == Token::IDENT) {
+          import->module_name = tokens.peek().metadata;
+          tokens.advance();
+          if (tokens.peek() == Token::DOT) {
+            throw_lex_error("bro im too lazy to do this, just stop doing stuff wiht beryllium", tokens.peek().line, tokens.peek().col);
+          }
+        } else {
+          throw_lex_error("a module name must come after an import statement", tokens.peek().line, tokens.peek().col);
+        }
+      } else if (tokens.peek() == Token::IDENT) {
+        import->module_name = tokens.peek().metadata;
+        tokens.advance();
+        bool module_name_detected = false; 
+        if (tokens.peek() == Token::SEMI) {
+            module_name_detected = true; 
+        }
+        while (!module_name_detected) { // hopefully i did this correctly
+          if (tokens.peek() == Token::DOT) {
+            import->module_name += ".";
+            tokens.advance();
+            if (tokens.peek() == Token::SEMI) {
+              throw_lex_error("module name cannot end on a dot", tokens.peek().line, tokens.peek().col);
+            }
+          } else if (tokens.peek() == Token::IDENT) {
+            import->module_name += tokens.peek().metadata;
+            tokens.advance();
+            if (tokens.peek() == Token::SEMI) {
+              log("yup i found the import statements");
+              module_name_detected = true;
+              break;
+            }
+          } else {
+            throw_lex_error("unexpected keyword at", tokens.peek().line, tokens.peek().col);
+          }
+        }
+      }
+      log("exitted the import contructer mess");
+      tokens.advance();
       return import;
     }
 
@@ -97,7 +182,6 @@ namespace beryl::be1 {
       return trait;
     }
   } // namespace
-
   ast::Program* parse(TokenStream& tokens, Arena& arena) {
     ast::Program* tree = arena.alloc<ast::Program>();
     while (tokens.has_next() && tokens.peek().type != Token::EOF_TOKEN) {

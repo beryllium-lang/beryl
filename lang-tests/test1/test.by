@@ -1,14 +1,5 @@
 import std.io;
 
-/*
-
-dskjb
-ekjfajkfb
-wskijabhfgwquisegh
-
-
-*/
-
 func start(args: dynarr<string>) {
   std.io.println("Hello world!");
 
@@ -23,4 +14,3 @@ func start(args: dynarr<string>) {
   var nest_gen_check: dynarr<unsafeptr<dynarr<int>>>;
   exit 0;
 }
-/*
